@@ -39,5 +39,29 @@ class PickupUnlockTests(unittest.TestCase):
                                              pickup_ids.EMBEDDED_ITEM_PICKUP_IDS))
 
 
+class ShrineUnlockTests(unittest.TestCase):
+    def test_unions_urns_without_touching_health(self):
+        import shrine_ids
+        data = load_fixture()
+        before_health = copy.deepcopy(data["Character"]["Health"])
+        added, total = uo.unlock_section(data, "ShrinesUnlocked",
+                                         shrine_ids.EMBEDDED_SHRINE_IDS)
+        shrines = data["Progress"]["ShrinesUnlocked"]
+        # pre-existing shrine preserved
+        self.assertIn("EXISTINGSHRINE0000000000000000AA", shrines)
+        # all catalog urns present
+        self.assertTrue(set(shrine_ids.EMBEDDED_SHRINE_IDS).issubset(set(shrines)))
+        self.assertEqual(added, len(shrine_ids.EMBEDDED_SHRINE_IDS))
+        # Health object is byte-for-byte unchanged
+        self.assertEqual(data["Character"]["Health"], before_health)
+
+    def test_computed_max_hp_matches_count(self):
+        import shrine_ids
+        data = load_fixture()
+        uo.unlock_section(data, "ShrinesUnlocked", shrine_ids.EMBEDDED_SHRINE_IDS)
+        n = len(data["Progress"]["ShrinesUnlocked"])
+        self.assertEqual(uo.computed_max_hp(data), 100 + 10 * n)
+
+
 if __name__ == "__main__":
     unittest.main()
