@@ -429,40 +429,39 @@ local SCHEMA_STOP = {
 }
 
 -- Enumerate a matched actor's OWN + inherited (up to Actor) property schema:
--- property name : type. For every property we also read its value and test it as
--- an FGuid (POD A/B/C/D reads only) so the persistence-GUID field is flagged even
--- though we don't know its name in advance. Reflection/metadata reads are safe;
--- reading a value never calls a method on a referenced UObject.
+-- property NAME : TYPE only. We deliberately do NOT read any property value here:
+-- reading an arbitrary property value off a live actor can be a native access
+-- violation that pcall cannot catch (a component/delegate/object pointer) - that
+-- is what crashed the F7 sweep. Reflection metadata (names/types via
+-- ForEachProperty) is safe. Once the FGuid property is identified by name+type
+-- from this list, GUID_PROPS reads only that ONE known field on the next run.
+-- Output is flushed per line so a crash still leaves the partial schema on disk.
 local function dumpActorSchema(o, out)
-    out:write("    -- property schema (name : type; FGuid values flagged) --\n")
+    out:write("    -- property schema (name : type), values NOT read --\n")
+    out:flush()
     local cls = safe(function() return o:GetClass() end)
     local walked = {}
     while cls and safe(function() return cls:IsValid() end) do
         local cname = safe(function() return cls:GetFName():ToString() end) or "?"
         if SCHEMA_STOP[cname] or walked[cname] then break end
         walked[cname] = true
-        out:write("    [" .. cname .. "]\n")
+        out:write("    [" .. cname .. "]\n"); out:flush()
+        prog("urn-discovery schema: " .. cname)
+        local lines = {}
         local ok = pcall(function()
             cls:ForEachProperty(function(prop)
                 local pn = safe(function() return prop:GetFName():ToString() end)
                 local pt = safe(function() return prop:GetClass():GetFName():ToString() end)
-                if pn then
-                    local raw = tryGet(o, pn)
-                    local hx = guidFromStruct(raw)
-                    local extra = ""
-                    if hx then
-                        local hit = KNOWN_URN_GUIDS[hx]
-                            and "   *** MATCHES KNOWN URN ***" or ""
-                        extra = "   => GUID " .. hx .. hit
-                    end
-                    out:write(string.format("      %-32s : %-16s%s\n",
-                        pn, tostring(pt), extra))
-                end
+                lines[#lines + 1] = string.format("      %-34s : %s",
+                    tostring(pn), tostring(pt))
             end)
         end)
-        if not ok then
-            out:write("      (ForEachProperty unavailable on this class)\n")
+        if ok then
+            for _, ln in ipairs(lines) do out:write(ln .. "\n") end
+        else
+            out:write("      (ForEachProperty unavailable/errored on this class)\n")
         end
+        out:flush()
         cls = safe(function() return cls:GetSuperStruct() end)
     end
 end
