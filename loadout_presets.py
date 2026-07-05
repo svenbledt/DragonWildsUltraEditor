@@ -104,9 +104,9 @@ _MELEE = {
     # Endgame off-hand = Dragonfire Shield (BiS), not Adamant Shield.
     "offhand": ["Bronze Shield", "Iron Shield", "Steel Shield", "Mithril Shield", "Dragonfire Shield"],
     # Endgame armour = Obsidian set (Helmet/Chest/Legs), not the Adamant set.
-    "head": ["Bronze Helmet", "Iron Helmet", "Steel Full Helm", "Black Knight Helmet", "Obsidian Helmet"],
-    "body": ["Bronze Platebody", "Iron Platebody", "Steel Platebody", "Black Knight Platebody", "Obsidian Chest"],
-    "legs": ["Bronze Platelegs", "Iron Platelegs", "Steel Platelegs", "Black Knight Platelegs", "Obsidian Legs"],
+    "head": ["Bronze Helmet", "Iron Helmet", "White Full Helm", "Black Knight Helmet", "Obsidian Helmet"],
+    "body": ["Bronze Platebody", "Iron Platebody", "White Platebody", "Black Knight Platebody", "Obsidian Chest"],
+    "legs": ["Bronze Platelegs", "Iron Platelegs", "White Platelegs", "Black Knight Platelegs", "Obsidian Legs"],
     "cape": ["Attack Cape"] * 5,
     "amulet": ["Amulet of Strength"] * 5,
 }
