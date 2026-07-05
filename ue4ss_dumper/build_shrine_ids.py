@@ -7,6 +7,7 @@ valid hex ids with KNOWN_SHRINE_IDS (harvested from real saves). Validates that
 every known id survives, and warns loudly if the dump contributed nothing new
 (a sign the data-asset scan did not reach the real urn ids). Not shipped.
 """
+import argparse
 import json
 import os
 import string
@@ -84,10 +85,19 @@ def write_module(ids, path):
 
 
 def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--dry-run", action="store_true",
+                    help="analyze only, do not write")
+    args = ap.parse_args()
+
     here = os.path.dirname(os.path.abspath(__file__))
     src = os.path.join(here, "ItemDumper_urns.jsonl")
     dst = os.path.join(os.path.dirname(here), "shrine_ids.py")
     records = load_records(src)
+    if not os.path.exists(src):
+        print("No ItemDumper_urns.jsonl found - Sanguine urns are in-world "
+              "actors, not data-assets, so the F8 data-asset dump does not "
+              "emit them. Using the known set harvested from real saves.")
     ids = build_ids(records)
     missing = validate(ids)
     if missing:
@@ -97,6 +107,11 @@ def main():
         print("WARNING: urn dump contributed 0 new hex ids - the data-asset "
               "scan likely did not reach the real urn ids. Shipping known set "
               "only; consider the in-world actor-sweep fallback.")
+    print("shrine ids: %d known + %d from dump = %d total"
+          % (len(KNOWN_SHRINE_IDS), contributed, len(ids)))
+    if args.dry_run:
+        print("\n--dry-run: not writing. Re-run without --dry-run to apply.")
+        return
     write_module(ids, dst)
     print("wrote %d shrine ids -> %s" % (len(ids), dst))
 

@@ -3,8 +3,10 @@ with EMBEDDED_ITEM_PICKUP_IDS: every real, obtainable item PersistenceID, so the
 Picked-Up Items unlocker can fill Progress.ItemsPickedUp without tripping the
 save's strict-mode validation. Run after regenerating the item dump. Not shipped.
 """
+import argparse
 import json
 import os
+import sys
 
 BAD_FOLDERS = ("/Deleted/", "/Dev/", "/Test/", "/Debug/")
 
@@ -63,11 +65,44 @@ def write_module(ids, path):
         f.write("]\n")
 
 
+def load_current_count(path):
+    """Count EMBEDDED_ITEM_PICKUP_IDS in an existing pickup_ids.py (0 if absent)."""
+    if not os.path.exists(path):
+        return 0
+    ns = {}
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            exec(compile(f.read(), path, "exec"), ns)  # noqa: S102 (trusted generated file)
+    except (OSError, SyntaxError):
+        return 0
+    return len(ns.get("EMBEDDED_ITEM_PICKUP_IDS", []))
+
+
 def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--dry-run", action="store_true",
+                    help="analyze only, do not write")
+    args = ap.parse_args()
+
     here = os.path.dirname(os.path.abspath(__file__))
     src = os.path.join(here, "ItemDumper_items.jsonl")
     dst = os.path.join(os.path.dirname(here), "pickup_ids.py")
-    ids = build_ids(load_records(src))
+    if not os.path.exists(src):
+        print("ERROR: %s not found. Run the F8 item dump first." % src)
+        sys.exit(1)
+
+    print("Reading item dump: %s" % src)
+    records = load_records(src)
+    print("Records in dump: %d" % len(records))
+    ids = build_ids(records)
+    current = load_current_count(dst)
+    print("Pickup ids (real, obtainable): %d" % len(ids))
+    print("Current pickup_ids.py entries: %d" % current)
+    print("  net change: %+d" % (len(ids) - current))
+
+    if args.dry_run:
+        print("\n--dry-run: not writing. Re-run without --dry-run to apply.")
+        return
     write_module(ids, dst)
     print("wrote %d ids -> %s" % (len(ids), dst))
 
