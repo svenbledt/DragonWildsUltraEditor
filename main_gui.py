@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 import json
 import os
+import sys
 import theme
 from tab_general import setup_general_tab
 from tab_character import setup_character_tab
@@ -10,6 +11,18 @@ from tab_extra import setup_extra_tab
 from tab_editor import setup_editor_tab
 
 SETTINGS_FILE = "settings.json"
+ICON_NAME = "Dragonwilds_Editor.ico"
+ABOUT_IMAGE = "Dragonwilds_Editor.png"
+
+
+def resource_path(name):
+    """Resolve a bundled data file in dev and inside the PyInstaller exe.
+
+    Frozen onefile builds extract data to sys._MEIPASS; from source it sits
+    next to this module.
+    """
+    base = getattr(sys, "_MEIPASS", os.path.dirname(os.path.abspath(__file__)))
+    return os.path.join(base, name)
 
 
 def get_progress_root(data):
@@ -195,23 +208,79 @@ class DragonWildsUltraEditor(tk.Frame):
             self.preview_text.config(state=tk.DISABLED)
 
     def show_about_dialog(self):
+        win = tk.Toplevel(self.master)
+        win.title("About — DragonWilds Ultra Editor")
+        win.transient(self.master)
+        win.resizable(False, False)
+        try:
+            win.iconbitmap(default=resource_path(ICON_NAME))
+        except Exception:
+            pass
+
+        frm = ttk.Frame(win, padding=16)
+        frm.pack(fill="both", expand=True)
+
+        # App icon, shown at a visible size. Keep a reference on self so the
+        # image isn't garbage-collected while the dialog is open.
+        try:
+            self._about_img = tk.PhotoImage(file=resource_path(ABOUT_IMAGE))
+            ttk.Label(frm, image=self._about_img).pack(pady=(0, 10))
+        except Exception:
+            pass
+
+        ttk.Label(frm, text="DragonWilds Ultra Editor",
+                  font=("Segoe UI", 15, "bold")).pack()
+
+        description = (
+            "A comprehensive save editor for RuneScape: Dragonwilds — edit your "
+            "character, skills, inventory, storage and unlocks, all with a live "
+            "JSON preview. This release continues the work of the original "
+            "creator, TatsumaYakoshi, carrying the project forward with new "
+            "features, fixes and an expanded unlock set."
+        )
+        ttk.Label(frm, text=description, wraplength=400,
+                  justify="center").pack(pady=(6, 12))
+
         features = [
-            "Features:",
+            "Features",
             "• View and edit your save file as JSON",
             "• Change character name and GUID",
             "• Edit skills from the Character tab",
-            "• Fully editable inventory and storage (add, remove, bulk, filter, slot/amount, etc.)",
+            "• Fully editable inventory and storage (add, remove, bulk, filter, slot/amount)",
             "• Apply gear and storage presets",
             "• Editable loadout (inventory tab)",
             "• Filter and search item lists by name",
             "• Live JSON preview for all changes",
             "• Unlock recipes, buildings, mounts, picked-up items and Sanguine Urns",
-            "• Resetting Health, Status Effects, etc.",
-            "Shout out to Elleandria for the help",
-            "Credits:",
-            "DragonWilds Ultra Editor by TatsumaYakoshi",
+            "• Reset Health, Status Effects, etc.",
         ]
-        messagebox.showinfo("About — Features & Credits", "\n".join(features))
+        ttk.Label(frm, text="\n".join(features), justify="left").pack(anchor="w")
+
+        credits = [
+            "Credits",
+            "• Originally created by TatsumaYakoshi",
+            "• Continued & maintained by TailwindDev (Contributor & Maintainer)",
+            "• Shout out to Elleandria for the help",
+        ]
+        ttk.Label(frm, text="\n".join(credits),
+                  justify="left").pack(anchor="w", pady=(12, 0))
+
+        ttk.Button(frm, text="Close", command=win.destroy).pack(pady=(14, 0))
+
+        theme.paint_tree(win, getattr(self, "palette", None))
+        win.update_idletasks()
+        # center over the main window
+        try:
+            px = self.master.winfo_rootx()
+            py = self.master.winfo_rooty()
+            pw = self.master.winfo_width()
+            ph = self.master.winfo_height()
+            w = win.winfo_width()
+            h = win.winfo_height()
+            win.geometry("+{}+{}".format(px + (pw - w) // 2, py + (ph - h) // 2))
+        except Exception:
+            pass
+        win.grab_set()
 
 
 if __name__ == "__main__":

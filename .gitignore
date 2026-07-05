@@ -6,3 +6,6 @@ __pycache__/
 build/
 dist/
 *.spec
+
+# Third-party tooling downloaded locally (dev-only, never shipped)
+FModel/
