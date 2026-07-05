@@ -12,22 +12,36 @@ import json
 import os
 import string
 
-# GUIDs confirmed present in real saves' Progress.ShrinesUnlocked. The first 7
-# were harvested from saves (Cpt. Trojan 170 HP, Zalacar 130 HP). The 8th was
-# confirmed end-to-end: the F7 sweep read a BP_HealthShrine_C actor's
-# UniqueShrineIdentifier FGuid, and unlocking that shrine in-game made the exact
-# reconstructed id appear in the save - proving the actor+field+byte-order.
-# The complete set comes from the F6 accumulator (ItemDumper_urns.jsonl), which
-# this script unions with these below.
+# The COMPLETE set of Sanguine Urns (18), extracted authoritatively from the
+# cooked game files - NOT roamed in-game. Method (see ShrineDump/): CUE4Parse
+# mounts the IoStore paks with the UE4SS-generated Mappings.usmap under
+# EGame.GAME_UE5_6, scans every .umap, and reads each BP_HealthShrine_C actor's
+# UniqueShrineIdentifier FGuid, formatted %08X%08X%08X%08X (the ShrinesUnlocked
+# save format). Two independent scans (all /maps/ packages, then all 1259 .umap
+# packages) both returned exactly these 18, with 0 errors.
+# Self-validated: all 8 previously save-harvested/in-game-confirmed GUIDs appear
+# here (incl. 186B64E2..., which was verified by unlocking it in-game and seeing
+# the exact id land in the save) - proving the parse + byte-order are correct.
+# A fully-unlocked character therefore has max HP = 100 + 10*18 = 280.
 KNOWN_SHRINE_IDS = [
-    "824A3798412A1067890E86A2AEB609FF",
-    "DB621D2A40316F7B97255696742C2AA1",
-    "7DE4A84C4997053BD7171089B408AE13",
-    "485514AA4D440FC3EBF331B6F5128ECE",
-    "DCF55CC14E4019584B5B03AB1D1ECC75",
+    "00BD25DE45F90484B177FDA9F0AC392E",
     "13A95FDF40A30E7465E66C96CAA63778",
-    "BA041CF14868F751575411B22EFE218A",
+    "13C2DCA14ADFC8C4A882FC9E92624D37",
     "186B64E241A3790BE54292A84653E981",
+    "30D8FACB490D76F52996A58311D5B528",
+    "485514AA4D440FC3EBF331B6F5128ECE",
+    "5D81E4DB41E190FF887E26B70012DCB6",
+    "7DE4A84C4997053BD7171089B408AE13",
+    "7F08EB5E423CA1F87DDC9C909EA0B3A8",
+    "824A3798412A1067890E86A2AEB609FF",
+    "ABB5944041C18CAAC148EF8EB84CE0B7",
+    "BA041CF14868F751575411B22EFE218A",
+    "D934D328425EF220C8050A82599895A8",
+    "DB621D2A40316F7B97255696742C2AA1",
+    "DCF55CC14E4019584B5B03AB1D1ECC75",
+    "F57EA8C8495F0671B12659A84D4D1239",
+    "FBA02FCB4F0443D2E48EBAA3ABDC5FE2",
+    "FFFC3EC542BE3EC01D043ABBD6DE12BD",
 ]
 
 _HEX = set(string.hexdigits.upper())
@@ -114,7 +128,8 @@ def main():
     if missing:
         print("WARNING: known shrine GUIDs missing from build:", missing)
     contributed = len(ids) - len(KNOWN_SHRINE_IDS)
-    if records and contributed == 0:
+    hex_records = sum(1 for r in records if is_hex_guid(r.get("PersistenceID")))
+    if records and hex_records == 0:
         # The file had records but none in ShrinesUnlocked's hex-GUID format:
         # the scan reached assets, but their PIDs are the wrong kind.
         print("WARNING: urn dump had records but 0 valid hex GUIDs - their "
