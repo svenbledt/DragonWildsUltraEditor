@@ -356,6 +356,159 @@ local function dumpUrns()
     log("dumped " .. kept .. " urn/shrine records -> " .. URN_OUT)
 end
 
+-- ===== Sanguine Urn ACTOR discovery sweep (opt-in, F7) =================
+-- The 7 known urn GUIDs are a PARTIAL set; the game has MORE urns whose ids we
+-- don't know. Those ids are PLACED-ACTOR persistence GUIDs baked into the level
+-- (World Partition), NOT data assets - every urn data-asset class returns
+-- FindAllOf==0, so the F8 dump can never emit them. To learn the complete set we
+-- first need the urn ACTOR's blueprint class name + which property holds its
+-- persistence FGuid. This sweep discovers both. It is CRASH-SAFE the same way the
+-- rest of the mod is: it reads only each actor's OWN class name (proven safe over
+-- 1392 items) and, for actors whose class name looks urn/shrine-ish, reads a fixed
+-- set of GUID/state properties DIRECTLY off the actor. It NEVER calls a method on
+-- a referenced UObject (component/pointer) - that is the uncatchable native crash.
+-- Usage: load into a WORLD, stand next to any Sanguine Urn (locked or unlocked),
+-- press F7 (or console: discover_urns). Output: ItemDumper_urn_discovery.txt
+local DISC_OUT = "ItemDumper_urn_discovery.txt"
+local URN_KEYWORDS = {
+    "urn", "shrine", "sanguine", "sanguin", "bloodpool", "lifepool",
+    "vital", "altar", "lifeshrine", "healthshrine", "obelisk", "font",
+}
+local GUID_PROPS = {
+    "PersistentGuid", "PersistenceGuid", "PersistentId", "PersistenceId",
+    "PersistenceID", "ActorGuid", "ActorGUID", "Guid", "GUID", "SaveGuid",
+    "SaveGUID", "SavedGuid", "UniqueId", "UniqueID", "Id", "ID", "ShrineGuid",
+    "ShrineId", "ShrineID", "UrnGuid", "UrnId", "PersistentActorGuid", "MyGuid",
+    "ObjectGuid", "PersistenceGUID", "StableGuid", "LevelActorGuid",
+}
+local STATE_PROPS = {
+    "bActivated", "bUnlocked", "bCollected", "bIsActivated", "bConsumed",
+    "Activated", "bInteracted", "bUsed", "bIsUnlocked", "bHasBeenActivated",
+}
+local KNOWN_URN_GUIDS = {
+    ["824A3798412A1067890E86A2AEB609FF"] = true,
+    ["DB621D2A40316F7B97255696742C2AA1"] = true,
+    ["7DE4A84C4997053BD7171089B408AE13"] = true,
+    ["485514AA4D440FC3EBF331B6F5128ECE"] = true,
+    ["DCF55CC14E4019584B5B03AB1D1ECC75"] = true,
+    ["13A95FDF40A30E7465E66C96CAA63778"] = true,
+    ["BA041CF14868F751575411B22EFE218A"] = true,
+}
+
+local function u32hex(x)
+    if type(x) ~= "number" then return nil end
+    x = math.floor(x)
+    if x < 0 then x = x + 4294967296 end
+    return string.format("%08X", x)
+end
+
+-- Reconstruct the 32-hex ShrinesUnlocked form from an FGuid's A/B/C/D (POD ints).
+local function guidFromStruct(v)
+    if type(v) ~= "userdata" then return nil end
+    local a = u32hex(tryGet(v, "A"))
+    local b = u32hex(tryGet(v, "B"))
+    local c = u32hex(tryGet(v, "C"))
+    local d = u32hex(tryGet(v, "D"))
+    if a and b and c and d then return a .. b .. c .. d end
+    return nil
+end
+
+local function nameMatches(cn)
+    local l = (type(cn) == "string") and cn:lower() or ""
+    for _, kw in ipairs(URN_KEYWORDS) do
+        if l:find(kw, 1, true) then return true end
+    end
+    return false
+end
+
+local function discoverUrnActors()
+    local out = io.open(DISC_OUT, "w")
+    if not out then log("cannot open " .. DISC_OUT); return end
+    out:write("=== Sanguine Urn ACTOR discovery sweep ===\n")
+    prog("urn-discovery: FindAllOf(Actor)")
+    local actors = safe(function() return FindAllOf("Actor") end)
+    local n = (type(actors) == "table") and #actors or 0
+    out:write("FindAllOf('Actor') = " .. n .. " actors\n")
+    if n == 0 then
+        out:write("\nNo actors loaded. Be IN A WORLD (not the main menu), near an urn.\n")
+        out:close()
+        log("urn-discovery: 0 actors - load into a world first")
+        return
+    end
+
+    local classCounts, matches = {}, 0
+    out:write("\n--- keyword-matching actors (urn/shrine/sanguine/vital/altar/...) ---\n")
+    for i = 1, n do
+        local o = actors[i]
+        local cn = safe(function() return o:GetClass():GetFName():ToString() end)
+        if cn then
+            classCounts[cn] = (classCounts[cn] or 0) + 1
+            if nameMatches(cn) then
+                matches = matches + 1
+                local fn = safe(function() return o:GetFullName() end)
+                prog("urn-discovery match " .. matches .. ": " .. tostring(cn))
+                out:write(string.format("\n[MATCH %d] class=%s\n  full=%s\n",
+                    matches, cn, tostring(fn)))
+                for _, pn in ipairs(GUID_PROPS) do
+                    local raw = tryGet(o, pn)
+                    if raw ~= nil then
+                        local hx = guidFromStruct(raw)          -- POD A/B/C/D (safe)
+                        local sv = nil
+                        local t = type(raw)
+                        if t == "string" or t == "number" then
+                            sv = raw
+                        elseif hx ~= nil then
+                            -- only ToString a userdata we've confirmed is an FGuid
+                            sv = safe(function() return raw:ToString() end)
+                        end
+                        if sv ~= nil or hx ~= nil then
+                            local hit = ""
+                            if hx and KNOWN_URN_GUIDS[hx] then
+                                hit = "   *** MATCHES KNOWN URN ***"
+                            elseif type(sv) == "string"
+                                    and KNOWN_URN_GUIDS[sv:upper()] then
+                                hit = "   *** MATCHES KNOWN URN ***"
+                            end
+                            out:write(string.format("    %-22s str:%s  abcd:%s%s\n",
+                                pn, tostring(sv), tostring(hx), hit))
+                        end
+                    end
+                end
+                for _, pn in ipairs(STATE_PROPS) do
+                    local sv = scalarize(tryGet(o, pn))
+                    if sv ~= nil then
+                        out:write(string.format("    %-22s %s\n", pn, tostring(sv)))
+                    end
+                end
+            end
+        end
+        if i % 5000 == 0 then out:flush() end
+    end
+
+    out:write(string.format(
+        "\n\n=== %d keyword-matching actors of %d total ===\n", matches, n))
+    -- full distinct class-name list (names only = safe) so the urn class can be
+    -- spotted by eye even if no keyword matched.
+    out:write("\n--- ALL distinct actor class names (name  x count) ---\n")
+    local names = {}
+    for cn in pairs(classCounts) do names[#names + 1] = cn end
+    table.sort(names)
+    for _, cn in ipairs(names) do
+        out:write(string.format("  %-52s x%d\n", cn, classCounts[cn]))
+    end
+    out:close()
+    prog("urn-discovery done")
+    log(string.format("urn-discovery: %d matches / %d actors -> %s",
+        matches, n, DISC_OUT))
+end
+
+local function runDiscoverGuarded()
+    ExecuteInGameThread(function()
+        local ok, err = pcall(discoverUrnActors)
+        if not ok then log("urn-discovery ERROR: " .. tostring(err)) end
+    end)
+end
+
 -- Find one item-data object from the player's inventory (to discover its class)
 local function sampleItemData()
     ck("  get PlayerController")
@@ -490,6 +643,7 @@ local function runGuarded()
 end
 
 RegisterKeyBind(Key.F8, {}, runGuarded)
+RegisterKeyBind(Key.F7, {}, runDiscoverGuarded)
 
 pcall(function()
     RegisterConsoleCommandHandler("dump_items", function()
@@ -497,5 +651,12 @@ pcall(function()
         return true
     end)
 end)
+pcall(function()
+    RegisterConsoleCommandHandler("discover_urns", function()
+        runDiscoverGuarded()
+        return true
+    end)
+end)
 
-log("Loaded (v2). In-world, press F8 (or console: dump_items) to dump the item list.")
+log("Loaded (v2). In-world: F8 (or console: dump_items) dumps the item list; "
+    .. "F7 (or discover_urns) sweeps urn actors to find their class + GUID.")
