@@ -1,0 +1,7 @@
+{
+    "Character": { "Health": { "CurrentValue": 90 } },
+    "Progress": {
+        "ItemsPickedUp": ["existingItemA"],
+        "ShrinesUnlocked": ["EXISTINGSHRINE0000000000000000AA"]
+    }
+}
