@@ -42,6 +42,36 @@ for _it in ITEM_LIST:
         _ID_TO_NAME.setdefault(_p, _n)
         _ID_TO_DUR[_p] = _it.get("Durability")
 
+# Expired / deprecated items must NEVER enter a template (storage OR inventory).
+# The game deprecates an item by spawning an "<name> (Expired)" twin; the base
+# item keeps its old, functional-looking record in a pre-rework catalog dump but
+# is non-functional in-game. So we treat as expired:
+#   (a) anything whose name contains "(Expired)", and
+#   (b) any base name that HAS an "(Expired)" twin (e.g. Weak/Lesser Healing
+#       Potion - the twin is the game's fingerprint for a deprecated item).
+# NB: PowerLevel == -1 is NOT used - it merely means "no combat power level" and
+# legitimately covers 400+ items (capes, seeds, rings, tools), so it would wrongly
+# exclude real gear. Every placement path consults _EXPIRED_PIDS;
+# test_no_expired_in_presets guards against regressions.
+_expired_bases = set()
+for _it in ITEM_LIST:
+    _n = _it.get("SourceString") or ""
+    if _n.endswith("(Expired)"):
+        _expired_bases.add(_n[: -len(" (Expired)")].strip())
+_EXPIRED_PIDS = set()
+for _it in ITEM_LIST:
+    _n = _it.get("SourceString") or ""
+    _p = _it.get("PersistenceID")
+    if not _p:
+        continue
+    if "(Expired)" in _n or _n in _expired_bases:
+        _EXPIRED_PIDS.add(_p)
+
+
+def _is_expired(pid):
+    """True if `pid` is an expired/deprecated item that must not be placed."""
+    return pid in _EXPIRED_PIDS
+
 # For a maxed item we want its FULL durability. The catalog's `Durability` field
 # IS the item's max (verified: worn items in real saves sit below this value,
 # never above). But many newer PL7 items (Obsidian, TokTz, tools, bows, staves)
@@ -148,10 +178,12 @@ _FOOD = [
     ["Monkfish Skewers", "Wild Pie"],
     ["Sun Baked Sole", "Smoked Infernal Eel"],
 ]
-# NOTE: the "Lesser Healing Potion" is expired/non-functional in-game (tooltip
-# flags it as expired), so it is never placed in a template. Only the two
-# functional heals remain: Weak Healing Potion (entry tier) and Healing Potion.
-_HEAL = ["Weak Healing Potion", "Healing Potion", "Healing Potion", "Healing Potion", "Healing Potion"]
+# NOTE: BOTH "Weak Healing Potion" and "Lesser Healing Potion" are expired/
+# non-functional post-rework - the catalog carries an "(Expired)" twin for each,
+# the game's fingerprint for a deprecated item. Only "Healing Potion" was never
+# deprecated, so it is the single functional heal, used at every tier. (The
+# _EXPIRED_PIDS guard also blocks either weak/lesser heal from ever being placed.)
+_HEAL = ["Healing Potion"] * 5
 _ANTIPOISON = ["Weak Antipoison Potion", "Lesser Antipoison Potion", "Antipoison Potion", "Antipoison Potion", "Super Antipoison Potion"]
 # Class-specific combat boost potion (magic only has the Lesser Magic Potion).
 _BOOST = {
@@ -287,7 +319,7 @@ def build_gear(region, cls):
     carry.extend(_id(t) for t in _TOOLS)          # gathering tools
     cslot = 8
     for cid in carry:
-        if not cid:
+        if not cid or _is_expired(cid):
             continue
         inv[str(cslot)] = _carry_entry(cid)
         cslot += 1
@@ -317,7 +349,7 @@ def build_storage(region, cls):
     slot = [0]
 
     def put(pid, vital_shield=None, count=None):
-        if not pid:
+        if not pid or _is_expired(pid):
             return
         key = str(slot[0])
         if slot[0] > 19:
