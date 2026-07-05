@@ -769,9 +769,24 @@ local function runGuarded()
     end)
 end
 
+-- F9: generate Mappings.usmap (UE4SS 3.x global) next to the game exe, so FModel
+-- can read cooked property values (UniqueShrineIdentifier) for static extraction
+-- of the COMPLETE urn set from the level files - no in-game roaming needed.
+local function runUsmapGuarded()
+    ExecuteInGameThread(function()
+        local ok, err = pcall(function() DumpUSMAP() end)
+        if ok then
+            log("DumpUSMAP: wrote Mappings.usmap next to the game exe (Win64).")
+        else
+            log("DumpUSMAP ERROR: " .. tostring(err))
+        end
+    end)
+end
+
 RegisterKeyBind(Key.F8, {}, runGuarded)
 RegisterKeyBind(Key.F7, {}, runDiscoverGuarded)
 RegisterKeyBind(Key.F6, {}, runAccumGuarded)
+RegisterKeyBind(Key.F9, {}, runUsmapGuarded)
 
 pcall(function()
     RegisterConsoleCommandHandler("dump_items", function()
@@ -791,7 +806,13 @@ pcall(function()
         return true
     end)
 end)
+pcall(function()
+    RegisterConsoleCommandHandler("dump_usmap", function()
+        runUsmapGuarded()
+        return true
+    end)
+end)
 
 log("Loaded (v2). In-world: F8 dumps items (+accumulates shrines); "
-    .. "F6 (dump_shrines) accumulates loaded Sanguine-urn GUIDs as you roam; "
-    .. "F7 (discover_urns) is the urn-actor discovery sweep.")
+    .. "F6 (dump_shrines) accumulates loaded Sanguine-urn GUIDs; "
+    .. "F7 (discover_urns) urn-actor sweep; F9 (dump_usmap) writes Mappings.usmap.")
