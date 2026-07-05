@@ -22,18 +22,21 @@ def _placed_pids(section):
 class NoExpiredInPresets(unittest.TestCase):
     def test_guard_found_the_known_expired_heals(self):
         # Sanity: the catalog-derived guard is non-empty and flags the two
-        # deprecated heals by their functional-looking base ids.
+        # twin-fingerprinted deprecated heals by their functional-looking ids.
         self.assertTrue(lp._EXPIRED_PIDS, "expired-pid guard is empty")
         for name in ("Weak Healing Potion", "Lesser Healing Potion"):
             pid = lp._NAME_TO_ID.get(name)
             self.assertIsNotNone(pid, name + " missing from catalog")
             self.assertTrue(lp._is_expired(pid), name + " not flagged expired")
 
-    def test_healing_potion_is_not_flagged(self):
-        # The one functional heal must remain placeable.
+    def test_base_healing_potion_is_flagged(self):
+        # The Umbral Sands rework cut the whole heal line. The base "Healing
+        # Potion" was deprecated WITHOUT an "(Expired)" twin, so it is flagged
+        # via the manual override and must never be placed.
         pid = lp._NAME_TO_ID.get("Healing Potion")
         self.assertIsNotNone(pid)
-        self.assertFalse(lp._is_expired(pid))
+        self.assertTrue(lp._is_expired(pid),
+                        "base Healing Potion must be flagged expired")
 
     def test_no_expired_item_in_any_gear_loadout(self):
         for key, gear in lp.GEAR_LOADOUTS.items():

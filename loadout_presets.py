@@ -67,6 +67,19 @@ for _it in ITEM_LIST:
     if "(Expired)" in _n or _n in _expired_bases:
         _EXPIRED_PIDS.add(_p)
 
+# (c) Some items were deprecated in-game WITHOUT the catalog spawning an
+# "(Expired)" twin, so the fingerprint above cannot see them. The Umbral Sands
+# rework cut the ENTIRE healing-potion line this way: the base "Healing Potion"
+# still carries a functional-looking record but is expired/non-functional
+# in-game (healing now comes from food). List such twinless-deprecated items by
+# name here so the guard blocks them everywhere.
+_MANUALLY_EXPIRED_NAMES = {"Healing Potion"}
+for _it in ITEM_LIST:
+    if (_it.get("SourceString") or "") in _MANUALLY_EXPIRED_NAMES:
+        _p = _it.get("PersistenceID")
+        if _p:
+            _EXPIRED_PIDS.add(_p)
+
 
 def _is_expired(pid):
     """True if `pid` is an expired/deprecated item that must not be placed."""
@@ -178,13 +191,13 @@ _FOOD = [
     ["Monkfish Skewers", "Wild Pie"],
     ["Sun Baked Sole", "Smoked Infernal Eel"],
 ]
-# NOTE: BOTH "Weak Healing Potion" and "Lesser Healing Potion" are expired/
-# non-functional post-rework - the catalog carries an "(Expired)" twin for each,
-# the game's fingerprint for a deprecated item. Only "Healing Potion" was never
-# deprecated, so it is the single functional heal, used at every tier. (The
-# _EXPIRED_PIDS guard also blocks either weak/lesser heal from ever being placed.)
-_HEAL = ["Healing Potion"] * 5
-_ANTIPOISON = ["Weak Antipoison Potion", "Lesser Antipoison Potion", "Antipoison Potion", "Antipoison Potion", "Super Antipoison Potion"]
+# NOTE: the ENTIRE healing-potion line is expired/non-functional after the
+# Umbral Sands rework - "Weak"/"Lesser Healing Potion" carry an "(Expired)" twin
+# (the game's fingerprint for a deprecated item) and the base "Healing Potion"
+# was cut without one (see _MANUALLY_EXPIRED_NAMES above). There is no functional
+# healing potion, so templates place NONE - healing is provided by food (cooked
+# fish is the top heal post-rework). The _EXPIRED_PIDS guard blocks all three.
+_ANTIPOISON =["Weak Antipoison Potion", "Lesser Antipoison Potion", "Antipoison Potion", "Antipoison Potion", "Super Antipoison Potion"]
 # Class-specific combat boost potion (magic only has the Lesser Magic Potion).
 _BOOST = {
     "Melee": ["Weak Focused Attack Potion", "Lesser Attack Potion", "Focused Attack Potion", "Focused Attack Potion", "Super Focused Attack Potion"],
@@ -390,9 +403,8 @@ def build_storage(region, cls):
     for food in _FOOD[tier]:
         put_name(food, count=STACK)
 
-    # combat potions
+    # combat potions (no heal potion exists post-rework - food is the heal)
     put_name(_BOOST[cls][tier], count=STACK)
-    put_name(_HEAL[tier], count=STACK)
     put_name(_ANTIPOISON[tier], count=STACK)
     if tier >= 3:  # endgame infusion
         put_name(_EXTRA_INFUSION[cls], count=STACK)
@@ -448,9 +460,8 @@ def _validate():
     for group in _FOOD:
         for n in group:
             ladders_all.append(("food", "-", n))
-    for lst in (_HEAL, _ANTIPOISON):
-        for n in lst:
-            ladders_all.append(("potion", "-", n))
+    for n in _ANTIPOISON:
+        ladders_all.append(("potion", "-", n))
     for cls, lst in _BOOST.items():
         for n in lst:
             ladders_all.append((cls, "boost", n))
