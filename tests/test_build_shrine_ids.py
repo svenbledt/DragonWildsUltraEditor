@@ -18,7 +18,12 @@ class ShrineBuildTests(unittest.TestCase):
         self.b = _load("build_shrine_ids", "ue4ss_dumper/build_shrine_ids.py")
 
     def test_known_ids_are_hex_guids(self):
-        self.assertEqual(len(self.b.KNOWN_SHRINE_IDS), 7)
+        # The known set grows as real urn GUIDs are confirmed (7 harvested from
+        # saves + verified additions from the F6 accumulator), so assert validity
+        # and uniqueness rather than a brittle exact count.
+        self.assertGreaterEqual(len(self.b.KNOWN_SHRINE_IDS), 8)
+        self.assertEqual(len(self.b.KNOWN_SHRINE_IDS),
+                         len(set(self.b.KNOWN_SHRINE_IDS)))
         for g in self.b.KNOWN_SHRINE_IDS:
             self.assertTrue(self.b.is_hex_guid(g), g)
 

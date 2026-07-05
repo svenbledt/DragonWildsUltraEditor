@@ -12,8 +12,13 @@ import json
 import os
 import string
 
-# GUIDs confirmed present in real saves' Progress.ShrinesUnlocked (7 distinct:
-# Cpt. Trojan had all 7 at 170 HP; Zalacar had 3 of them at 130 HP).
+# GUIDs confirmed present in real saves' Progress.ShrinesUnlocked. The first 7
+# were harvested from saves (Cpt. Trojan 170 HP, Zalacar 130 HP). The 8th was
+# confirmed end-to-end: the F7 sweep read a BP_HealthShrine_C actor's
+# UniqueShrineIdentifier FGuid, and unlocking that shrine in-game made the exact
+# reconstructed id appear in the save - proving the actor+field+byte-order.
+# The complete set comes from the F6 accumulator (ItemDumper_urns.jsonl), which
+# this script unions with these below.
 KNOWN_SHRINE_IDS = [
     "824A3798412A1067890E86A2AEB609FF",
     "DB621D2A40316F7B97255696742C2AA1",
@@ -22,6 +27,7 @@ KNOWN_SHRINE_IDS = [
     "DCF55CC14E4019584B5B03AB1D1ECC75",
     "13A95FDF40A30E7465E66C96CAA63778",
     "BA041CF14868F751575411B22EFE218A",
+    "186B64E241A3790BE54292A84653E981",
 ]
 
 _HEX = set(string.hexdigits.upper())
@@ -95,13 +101,14 @@ def main():
     dst = os.path.join(os.path.dirname(here), "shrine_ids.py")
     records = load_records(src)
     if not records:
-        # Missing OR empty (0-byte placeholder): the data-asset scan produced
-        # no urn records at all - the expected result, since Sanguine urns are
-        # in-world actors, not data-assets.
+        # Missing OR empty: no accumulated shrine ids yet. Urns are in-world level
+        # actors (BP_HealthShrine_C); the in-game F6/F8 accumulator writes their
+        # real UniqueShrineIdentifier GUIDs here as you roam past them. Run it
+        # across every region to build the complete set, then re-run this script.
         state = "empty" if os.path.exists(src) else "absent"
-        print("Urn dump is %s - Sanguine urns are in-world actors, not "
-              "data-assets, so the F8 data-asset dump does not emit them. "
-              "Using the known set harvested from real saves." % state)
+        print("Urn accumulator file is %s - roam the map pressing F6 (dump_shrines) "
+              "to collect BP_HealthShrine_C UniqueShrineIdentifier GUIDs into %s. "
+              "Using the known set for now." % (state, os.path.basename(src)))
     ids = build_ids(records)
     missing = validate(ids)
     if missing:

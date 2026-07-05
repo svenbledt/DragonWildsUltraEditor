@@ -399,6 +399,7 @@ local KNOWN_URN_GUIDS = {
     ["DCF55CC14E4019584B5B03AB1D1ECC75"] = true,
     ["13A95FDF40A30E7465E66C96CAA63778"] = true,
     ["BA041CF14868F751575411B22EFE218A"] = true,
+    ["186B64E241A3790BE54292A84653E981"] = true,  -- confirmed via in-game unlock
 }
 
 local function u32hex(x)
@@ -563,6 +564,76 @@ local function runDiscoverGuarded()
     end)
 end
 
+-- ===== Sanguine Urn GUID accumulator (F6) ==============================
+-- CONFIRMED end-to-end: the ShrinesUnlocked entry is BP_HealthShrine_C's
+-- UniqueShrineIdentifier FGuid, reconstructed as %08X%08X%08X%08X of A/B/C/D
+-- (matched a real save byte-for-byte). This targeted read is safe (POD FGuid).
+-- World Partition only streams nearby cells, so we ACCUMULATE: each press unions
+-- every currently-loaded shrine's id into ItemDumper_urns.jsonl (the same file
+-- build_shrine_ids.py consumes). Roam every region, pressing F6, until the total
+-- stops growing - that yields the complete urn set. Cumulative across sessions.
+local SHRINE_GUID_OUT   = "ItemDumper_urns.jsonl"
+local SHRINE_ACTOR_CLASS = "BP_HealthShrine_C"
+local SHRINE_GUID_FIELD  = "UniqueShrineIdentifier"
+local EMPTY_GUID = "00000000000000000000000000000000"
+
+local function loadExistingShrineGuids()
+    local set, count = {}, 0
+    local f = io.open(SHRINE_GUID_OUT, "r")
+    if not f then return set, 0 end
+    for line in f:lines() do
+        local hx = line:match('"PersistenceID"%s*:%s*"(%x+)"')
+        if hx and #hx == 32 then
+            hx = hx:upper()
+            if not set[hx] then set[hx] = true; count = count + 1 end
+        end
+    end
+    f:close()
+    return set, count
+end
+
+local function accumulateShrines()
+    local set, before = loadExistingShrineGuids()
+    local arr = safe(function() return FindAllOf(SHRINE_ACTOR_CLASS) end)
+    local n = (type(arr) == "table") and #arr or 0
+    ck(string.format("shrine-accum: FindAllOf(%s)=%d (had %d)",
+        SHRINE_ACTOR_CLASS, n, before))
+    local added = 0
+    for i = 1, n do
+        local o = arr[i]
+        prog("shrine-accum " .. i .. "/" .. n)
+        if o and safe(function() return o:IsValid() end) then
+            local hx = guidFromStruct(tryGet(o, SHRINE_GUID_FIELD))
+            if hx and #hx == 32 and hx ~= EMPTY_GUID and not set[hx] then
+                set[hx] = true
+                added = added + 1
+                ck("  + " .. hx)
+            end
+        end
+    end
+    local keys = {}
+    for k in pairs(set) do keys[#keys + 1] = k end
+    table.sort(keys)
+    local out = io.open(SHRINE_GUID_OUT, "w")
+    if out then
+        for _, k in ipairs(keys) do
+            out:write(string.format(
+                '{"PersistenceID":"%s","__class":"%s"}\n', k, SHRINE_ACTOR_CLASS))
+        end
+        out:close()
+    end
+    log(string.format("shrine-accum: %d loaded, +%d new, %d total -> %s",
+        n, added, #keys, SHRINE_GUID_OUT))
+    ck(string.format("shrine-accum DONE: +%d new, %d total", added, #keys))
+end
+
+local function runAccumGuarded()
+    ExecuteInGameThread(function()
+        local ok, err = pcall(accumulateShrines)
+        if not ok then log("shrine-accum ERROR: " .. tostring(err)) end
+    end)
+end
+
 -- Find one item-data object from the player's inventory (to discover its class)
 local function sampleItemData()
     ck("  get PlayerController")
@@ -681,9 +752,11 @@ local function dumpAll()
     local okb, errb = pcall(dumpBuildings)
     if not okb then ck("building dump ERROR: " .. tostring(errb)) end
 
-    -- and Sanguine Urns / lifepool shrines (separate id namespace)
-    local oku, erru = pcall(dumpUrns)
-    if not oku then ck("urn dump ERROR: " .. tostring(erru)) end
+    -- and Sanguine Urns: accumulate every loaded BP_HealthShrine_C's real
+    -- UniqueShrineIdentifier GUID (cumulative). The old data-asset dumpUrns()
+    -- always returned 0 (urns are level actors, not data assets) - superseded.
+    local oku, erru = pcall(accumulateShrines)
+    if not oku then ck("shrine-accum ERROR: " .. tostring(erru)) end
 end
 
 local function runGuarded()
@@ -698,6 +771,7 @@ end
 
 RegisterKeyBind(Key.F8, {}, runGuarded)
 RegisterKeyBind(Key.F7, {}, runDiscoverGuarded)
+RegisterKeyBind(Key.F6, {}, runAccumGuarded)
 
 pcall(function()
     RegisterConsoleCommandHandler("dump_items", function()
@@ -711,6 +785,13 @@ pcall(function()
         return true
     end)
 end)
+pcall(function()
+    RegisterConsoleCommandHandler("dump_shrines", function()
+        runAccumGuarded()
+        return true
+    end)
+end)
 
-log("Loaded (v2). In-world: F8 (or console: dump_items) dumps the item list; "
-    .. "F7 (or discover_urns) sweeps urn actors to find their class + GUID.")
+log("Loaded (v2). In-world: F8 dumps items (+accumulates shrines); "
+    .. "F6 (dump_shrines) accumulates loaded Sanguine-urn GUIDs as you roam; "
+    .. "F7 (discover_urns) is the urn-actor discovery sweep.")
