@@ -65,6 +65,8 @@ echo [5/5] Running PyInstaller (this can take a minute) ...
     --onefile ^
     --windowed ^
     --name "%APPNAME%" ^
+    --icon "Dragonwilds_Editor.ico" ^
+    --add-data "Dragonwilds_Editor.ico;." ^
     --collect-data sv_ttk ^
     launcher.py
 if errorlevel 1 ( echo [ERROR] PyInstaller build failed. See the log above. & goto :fail )
