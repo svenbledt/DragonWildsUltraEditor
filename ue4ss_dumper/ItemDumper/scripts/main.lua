@@ -421,6 +421,52 @@ local function nameMatches(cn)
     return false
 end
 
+-- Stop the schema walk at these bases (Actor/Object carry huge, irrelevant
+-- property sets; the urn's persistence GUID lives on the BP or a nearer C++ base).
+local SCHEMA_STOP = {
+    Actor = true, Object = true, DominionDataAsset = true, DataAsset = true,
+    PrimaryDataAsset = true,
+}
+
+-- Enumerate a matched actor's OWN + inherited (up to Actor) property schema:
+-- property name : type. For every property we also read its value and test it as
+-- an FGuid (POD A/B/C/D reads only) so the persistence-GUID field is flagged even
+-- though we don't know its name in advance. Reflection/metadata reads are safe;
+-- reading a value never calls a method on a referenced UObject.
+local function dumpActorSchema(o, out)
+    out:write("    -- property schema (name : type; FGuid values flagged) --\n")
+    local cls = safe(function() return o:GetClass() end)
+    local walked = {}
+    while cls and safe(function() return cls:IsValid() end) do
+        local cname = safe(function() return cls:GetFName():ToString() end) or "?"
+        if SCHEMA_STOP[cname] or walked[cname] then break end
+        walked[cname] = true
+        out:write("    [" .. cname .. "]\n")
+        local ok = pcall(function()
+            cls:ForEachProperty(function(prop)
+                local pn = safe(function() return prop:GetFName():ToString() end)
+                local pt = safe(function() return prop:GetClass():GetFName():ToString() end)
+                if pn then
+                    local raw = tryGet(o, pn)
+                    local hx = guidFromStruct(raw)
+                    local extra = ""
+                    if hx then
+                        local hit = KNOWN_URN_GUIDS[hx]
+                            and "   *** MATCHES KNOWN URN ***" or ""
+                        extra = "   => GUID " .. hx .. hit
+                    end
+                    out:write(string.format("      %-32s : %-16s%s\n",
+                        pn, tostring(pt), extra))
+                end
+            end)
+        end)
+        if not ok then
+            out:write("      (ForEachProperty unavailable on this class)\n")
+        end
+        cls = safe(function() return cls:GetSuperStruct() end)
+    end
+end
+
 local function discoverUrnActors()
     local out = io.open(DISC_OUT, "w")
     if not out then log("cannot open " .. DISC_OUT); return end
@@ -480,6 +526,9 @@ local function discoverUrnActors()
                         out:write(string.format("    %-22s %s\n", pn, tostring(sv)))
                     end
                 end
+                -- full property schema + FGuid value scan (finds the GUID field
+                -- regardless of its name)
+                dumpActorSchema(o, out)
             end
         end
         if i % 5000 == 0 then out:flush() end
