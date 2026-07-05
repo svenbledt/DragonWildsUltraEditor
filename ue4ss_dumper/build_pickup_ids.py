@@ -39,8 +39,17 @@ def build_ids(records):
 
 
 def load_records(path):
+    records = []
     with open(path, "r", encoding="utf-8") as f:
-        return [json.loads(line) for line in f if line.strip()]
+        for lineno, line in enumerate(f, 1):
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                records.append(json.loads(line))
+            except json.JSONDecodeError as e:
+                raise ValueError(f"{path}: malformed JSON on line {lineno}: {e}") from e
+    return records
 
 
 def write_module(ids, path):
