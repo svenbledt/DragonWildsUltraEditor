@@ -309,6 +309,53 @@ local function dumpBuildings()
     log("dumped " .. kept .. " building records -> " .. BUILDING_OUT)
 end
 
+-- ===== Sanguine Urn / shrine dump (crash-safe) =========================
+-- Lifepool-expanding "Sanguine Urns" are tracked in the save via
+-- Progress.ShrinesUnlocked - 32-char uppercase hex FGuids (level-actor
+-- persistence ids), a SEPARATE namespace from item/recipe/building PIDs.
+-- We do a pure class-name scan (FindAllOf + POD reads only, never deref a
+-- referenced UObject) over candidate shrine/urn data-asset classes. Whichever
+-- exist get dumped, deduped by full name. build_shrine_ids.py then validates
+-- the result against the known GUIDs harvested from real saves.
+local URN_OUT = "ItemDumper_urns.jsonl"
+local URN_CLASS_CANDIDATES = {
+    "SanguineUrnData", "ShrineData", "HealthShrineData", "LifePoolShrineData",
+    "LifeShrineData", "ShrineDataAsset", "InteractableShrineData", "SanguineUrn",
+    "HealthUpgradeData", "MaxHealthShrineData", "VitalityShrineData",
+}
+
+local function dumpUrns()
+    ck("=== urn/shrine dump (class-name scan, crash-safe) ===")
+    local out = io.open(URN_OUT, "w")
+    if not out then ck("cannot open " .. URN_OUT); return end
+    local kept, seen = 0, {}
+    for _, tname in ipairs(URN_CLASS_CANDIDATES) do
+        local arr = safe(function() return FindAllOf(tname) end)
+        local n = (type(arr) == "table") and #arr or 0
+        ck("  FindAllOf(" .. tname .. ") = " .. n)
+        for i = 1, n do
+            local o = arr[i]
+            local fn = safe(function() return o:GetFullName() end)
+            prog("urn " .. tname .. " " .. i .. "/" .. n .. "  " .. tostring(fn))
+            if o and safe(function() return o:IsValid() end) then
+                local key = fn or tostring(o)
+                if not seen[key] then
+                    local pid = scalarize(tryGet(o, "PersistenceID"))
+                    if pid ~= nil then
+                        seen[key] = true
+                        out:write(recordToJson(readRecord(o)) .. "\n")
+                        out:flush()
+                        kept = kept + 1
+                    end
+                end
+            end
+        end
+    end
+    out:close()
+    ck("urn DONE: " .. kept .. " records -> " .. URN_OUT)
+    log("dumped " .. kept .. " urn/shrine records -> " .. URN_OUT)
+end
+
 -- Find one item-data object from the player's inventory (to discover its class)
 local function sampleItemData()
     ck("  get PlayerController")
@@ -426,6 +473,10 @@ local function dumpAll()
     -- and buildings (separate asset class / id namespace)
     local okb, errb = pcall(dumpBuildings)
     if not okb then ck("building dump ERROR: " .. tostring(errb)) end
+
+    -- and Sanguine Urns / lifepool shrines (separate id namespace)
+    local oku, erru = pcall(dumpUrns)
+    if not oku then ck("urn dump ERROR: " .. tostring(erru)) end
 end
 
 local function runGuarded()
