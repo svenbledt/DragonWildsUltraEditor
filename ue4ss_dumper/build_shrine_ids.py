@@ -94,19 +94,25 @@ def main():
     src = os.path.join(here, "ItemDumper_urns.jsonl")
     dst = os.path.join(os.path.dirname(here), "shrine_ids.py")
     records = load_records(src)
-    if not os.path.exists(src):
-        print("No ItemDumper_urns.jsonl found - Sanguine urns are in-world "
-              "actors, not data-assets, so the F8 data-asset dump does not "
-              "emit them. Using the known set harvested from real saves.")
+    if not records:
+        # Missing OR empty (0-byte placeholder): the data-asset scan produced
+        # no urn records at all - the expected result, since Sanguine urns are
+        # in-world actors, not data-assets.
+        state = "empty" if os.path.exists(src) else "absent"
+        print("Urn dump is %s - Sanguine urns are in-world actors, not "
+              "data-assets, so the F8 data-asset dump does not emit them. "
+              "Using the known set harvested from real saves." % state)
     ids = build_ids(records)
     missing = validate(ids)
     if missing:
         print("WARNING: known shrine GUIDs missing from build:", missing)
     contributed = len(ids) - len(KNOWN_SHRINE_IDS)
-    if os.path.exists(src) and contributed == 0:
-        print("WARNING: urn dump contributed 0 new hex ids - the data-asset "
-              "scan likely did not reach the real urn ids. Shipping known set "
-              "only; consider the in-world actor-sweep fallback.")
+    if records and contributed == 0:
+        # The file had records but none in ShrinesUnlocked's hex-GUID format:
+        # the scan reached assets, but their PIDs are the wrong kind.
+        print("WARNING: urn dump had records but 0 valid hex GUIDs - their "
+              "PIDs are not ShrinesUnlocked-format. Shipping known set only; "
+              "consider the in-world actor-sweep fallback.")
     print("shrine ids: %d known + %d from dump = %d total"
           % (len(KNOWN_SHRINE_IDS), contributed, len(ids)))
     if args.dry_run:
