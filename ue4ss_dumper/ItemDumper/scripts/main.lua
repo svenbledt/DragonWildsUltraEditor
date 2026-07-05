@@ -374,12 +374,18 @@ local URN_KEYWORDS = {
     "urn", "shrine", "sanguine", "sanguin", "bloodpool", "lifepool",
     "vital", "altar", "lifeshrine", "healthshrine", "obelisk", "font",
 }
+-- The two FGuid StructProperties discovered on BP_HealthShrine_C's schema are
+-- listed FIRST: UniqueShrineIdentifier (HealthShrine base) and SpudGuid
+-- (WorldActor base; SPUD = Steve's Persistent Unreal Data save plugin). One of
+-- these is the value stored in Progress.ShrinesUnlocked. Both are safe POD
+-- (FGuid) reads. The rest are legacy guesses, harmless if absent.
 local GUID_PROPS = {
+    "UniqueShrineIdentifier", "SpudGuid",
     "PersistentGuid", "PersistenceGuid", "PersistentId", "PersistenceId",
     "PersistenceID", "ActorGuid", "ActorGUID", "Guid", "GUID", "SaveGuid",
     "SaveGUID", "SavedGuid", "UniqueId", "UniqueID", "Id", "ID", "ShrineGuid",
     "ShrineId", "ShrineID", "UrnGuid", "UrnId", "PersistentActorGuid", "MyGuid",
-    "ObjectGuid", "PersistenceGUID", "StableGuid", "LevelActorGuid",
+    "ObjectGuid", "PersistenceGUID", "StableGuid", "LevelActorGuid", "WorldTag",
 }
 local STATE_PROPS = {
     "bActivated", "bUnlocked", "bCollected", "bIsActivated", "bConsumed",
