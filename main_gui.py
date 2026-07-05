@@ -66,6 +66,8 @@ class DragonWildsUltraEditor(tk.Frame):
         self.palette = theme.apply_theme(master, self.theme_mode)
         self.create_widgets()
         self._repaint()
+        # Greet the user with the About dialog once the main window has drawn.
+        self.master.after(200, self.show_about_dialog)
 
     def get_initial_dir(self):
         return self.settings.get("save_data_path", get_default_save_path())
