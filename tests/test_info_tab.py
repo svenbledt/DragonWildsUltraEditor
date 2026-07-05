@@ -43,7 +43,7 @@ class InfoTabTests(unittest.TestCase):
         tab_general.setup_general_tab(frame, editor)
         texts = all_label_texts(frame)
         self.assertIn("Testarossa", texts)
-        self.assertIn("Hardcore", texts)
+        self.assertIn("Creative", texts)
         self.assertIsNotNone(editor.preview_text)
 
     def test_empty_state_without_data(self):

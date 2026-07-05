@@ -1,5 +1,5 @@
 {
-    "Hardcore": 1,
+    "meta_data": { "char_type": 3 },
     "Customization": { "char_name": "Testarossa" },
     "GameProgress": {
         "Skills": { "Skills": [

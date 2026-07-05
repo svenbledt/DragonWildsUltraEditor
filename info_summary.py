@@ -1,13 +1,21 @@
 """Pure, Tk-free character-summary extraction for the Info tab.
 
 Operates on the full save document (main_gui's self.data): the character name is
-a nested "char_name" value, mode is the top-level "Hardcore" flag, and skills
-live at <progress_root>.Skills.Skills as {"Id", "Xp"} entries. Every field
-degrades to a dash / 0 on missing or malformed data; build_summary never raises.
+a nested "char_name" value, mode is meta_data.char_type (the same field the
+editable Mode dropdown on the General tab reads), and skills live at
+<progress_root>.Skills.Skills as {"Id", "Xp"} entries. Every field degrades to a
+dash / 0 on missing or malformed data; build_summary never raises.
 """
 from leveling import get_level_for_xp
 
 DASH = "—"  # em dash, shown for unknown fields
+
+# Game mode is stored as an int in meta_data.char_type. This mirrors
+# MODE_OPTIONS in tab_character.py (the General-tab dropdown's source of truth).
+# Note: RSDragonwilds does not actually ship a Hardcore mode; real saves are
+# Normal (0) with Creative/Custom for the sandbox variants. A loaded save with
+# no meta_data defaults to Normal, matching the General tab.
+CHAR_TYPE_LABELS = {0: "Normal", 1: "Hardcore", 3: "Creative", 4: "Custom"}
 
 # Skill data-asset ids (mirrors tab_skills.SKILL_IDS). len() is the summary total.
 SKILL_IDS = [
@@ -50,8 +58,9 @@ def build_summary(data):
     name = find_first_value(data, "char_name")
     name = name if isinstance(name, str) and name else DASH
 
-    hc = data.get("Hardcore")
-    mode = DASH if hc is None else ("Hardcore" if hc else "Normal")
+    meta = data.get("meta_data")
+    char_type = meta.get("char_type", 0) if isinstance(meta, dict) else 0
+    mode = CHAR_TYPE_LABELS.get(char_type, "Normal")
 
     root = _progress_root(data)
     skills = []
