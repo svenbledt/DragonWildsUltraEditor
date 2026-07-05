@@ -45,6 +45,10 @@ class FullyUnlockedTests(unittest.TestCase):
     def test_false_on_no_save(self):
         self.assertFalse(uo.is_fully_unlocked(None, "R", ["a"]))
 
+    def test_empty_catalog_is_not_fully_unlocked(self):
+        data = {"Progress": {"SomeSection": ["a", "b"]}}
+        self.assertFalse(uo.is_fully_unlocked(data, "SomeSection", []))
+
 
 class MaxHpTests(unittest.TestCase):
     def test_base_when_no_shrines(self):

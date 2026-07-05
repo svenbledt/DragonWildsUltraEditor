@@ -43,6 +43,9 @@ def unlock_section(data, section_key, ids):
 
 def is_fully_unlocked(data, section_key, ids):
     """True if every id in `ids` is already present in the save section."""
+    ids = list(ids)
+    if not ids:
+        return False
     if not isinstance(data, dict):
         return False
     progress = data.get("Progress")
