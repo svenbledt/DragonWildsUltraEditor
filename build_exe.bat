@@ -141,7 +141,7 @@ REM --- 6. Package the folder into a distributable zip ---------
 REM  Rename + zip + verify entirely inside %BUILDDIR%: cloud-sync
 REM  clients (Google Drive) start hashing files the moment they land
 REM  in the project tree, and Compress-Archive then dies on their
-REM  locks. Only two atomic same-volume moves touch dist\ at the end.
+REM  locks. Only two moves touch dist\ at the end.
 REM  Compress-Archive failures are non-terminating (powershell.exe
 REM  still exits 0 and a truncated zip gets reported as BUILD
 REM  COMPLETE), so it runs with -ErrorAction Stop in a try/catch and
@@ -154,8 +154,12 @@ powershell -NoProfile -Command "try { Compress-Archive -Path '%BUILDDIR%\%APPNAM
 if errorlevel 1 ( echo [ERROR] Zipping the standalone folder failed - nothing was placed in dist. & goto :fail )
 move "%BUILDDIR%\%APPNAME%-standalone.zip" "dist\%APPNAME%-standalone.zip" >nul
 if errorlevel 1 ( echo [ERROR] Could not move the zip into dist. & goto :fail )
-move "%BUILDDIR%\%APPNAME%" "dist\%APPNAME%" >nul
-if errorlevel 1 ( echo [ERROR] Could not move the app folder into dist. & goto :fail )
+REM  cmd's `move` cannot move a DIRECTORY across volumes (build dir is
+REM  on %LOCALAPPDATA%'s drive, the project may live on another) - it
+REM  fails with "Access denied". robocopy /MOVE handles both cases;
+REM  exit codes 0-7 mean success, 8+ mean failure.
+robocopy "%BUILDDIR%\%APPNAME%" "dist\%APPNAME%" /E /MOVE /NFL /NDL /NJH /NJS >nul
+if errorlevel 8 ( echo [ERROR] Could not move the app folder into dist. & goto :fail )
 if exist "%BUILDDIR%" rmdir /s /q "%BUILDDIR%"
 
 echo(
