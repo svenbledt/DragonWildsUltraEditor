@@ -8,7 +8,9 @@ import json
 import os
 import sys
 
-BAD_FOLDERS = ("/Deleted/", "/Dev/", "/Test/", "/Debug/")
+# /AlwaysCook/ holds cook-forcing blueprint duplicates, not obtainable items
+# (e.g. the Fire Cape vestige recipe-unlocker, which breaks the strict load).
+BAD_FOLDERS = ("/Deleted/", "/Dev/", "/Test/", "/Debug/", "/AlwaysCook/")
 
 
 def item_name(rec):

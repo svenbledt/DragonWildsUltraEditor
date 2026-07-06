@@ -57,12 +57,25 @@ class RealDumpTests(unittest.TestCase):
         self.recs = self.b.load_records(os.path.join(ROOT, "tools", "ue4ss_dumper", "ItemDumper_items.jsonl"))
 
     def test_expected_count(self):
-        self.assertEqual(len(self.b.build_ids(self.recs)), 1365)
+        self.assertEqual(len(self.b.build_ids(self.recs)), 1364)
 
     def test_expired_lesser_healing_excluded(self):
         ids = set(self.b.build_ids(self.recs))
         for pid in ("lPzqZUcSYtHIhWmVyYKJ_Q", "zwfSHEp0CHGOFuOzNQA2OQ", "-9Zin0B1C7GQgVKwKSR0hQ"):
             self.assertNotIn(pid, ids)
+
+    def test_fire_cape_alwayscook_vestige_excluded(self):
+        # DA_Consumable_Vestige_Armour_Cape_Fire lives in /AlwaysCook/ (a
+        # cook-forcing blueprint duplicate); in ItemsPickedUp it breaks the
+        # strict load. The real Fire Cape (ITEM_Cape_Fire) must stay.
+        ids = set(self.b.build_ids(self.recs))
+        self.assertNotIn("NndX3U-UM-JVFaKvgrz8Eg", ids)
+        self.assertIn("36kwMUzRF5L6DG-k7YgkSw", ids)
+
+    def test_drops_alwayscook_folder(self):
+        rec = {"PersistenceID": "ac1", "SourceString": "Fire Cape Vestige",
+               "__fullname": "X /UmbralSands/Gameplay/Items/AlwaysCook/DA_V.DA_V"}
+        self.assertFalse(self.b.keep_record(rec))
 
 
 if __name__ == "__main__":
