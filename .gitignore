@@ -10,3 +10,5 @@ build_output.log
 
 # Third-party tooling downloaded locally (dev-only, never shipped)
 FModel/
+.pytest_cache/
+settings.json
