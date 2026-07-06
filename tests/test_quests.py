@@ -1,5 +1,7 @@
 import os
 
+import pytest
+
 from core.save_file import SaveFile
 from core import inventory as inv, quests
 from data.quest_data import EMBEDDED_QUESTS
@@ -216,3 +218,109 @@ def test_first_main_quest_and_side_quests_never_blocked():
     sf = _sf()
     assert quests.main_story_blockers(sf, _quest("Quest_DragonSlayer")) == []
     assert quests.main_story_blockers(sf, _quest("Quest_CooksAssistant")) == []
+
+
+# ---- objective ladder -----------------------------------------------------
+
+def test_set_objective_puts_quest_in_progress_at_that_objective():
+    sf = _sf()
+    q = _quest("Quest_CooksAssistant")
+    quests.set_objective(sf, q, q["objectives"][2])
+    entry = sf.progress["QuestProgress"]["Quests"][0]
+    assert entry["QuestState"] == quests.STATE_IN_PROGRESS
+    assert entry["QuestObjective"] == q["objectives"][2]
+    assert sf.dirty is True
+
+
+def test_set_objective_rejects_unknown_id():
+    sf = _sf()
+    q = _quest("Quest_CooksAssistant")
+    with pytest.raises(ValueError):
+        quests.set_objective(sf, q, "NotARealObjective")
+    assert quests.get_states(sf) == {}
+
+
+def test_set_objective_at_final_objective_reads_ready_to_turn_in():
+    sf = _sf()
+    q = _quest("Quest_CooksAssistant")
+    quests.set_objective(sf, q, q["objectives"][-1])
+    entry = sf.progress["QuestProgress"]["Quests"][0]
+    assert quests.display_state(
+        q, entry["QuestState"], entry["QuestObjective"]) == quests.READY_LABEL
+
+
+def test_objective_label_uses_text_with_id_fallback():
+    dr = _quest("Quest_DR_MainQuest")
+    assert quests.objective_label(dr, "DR_Main_Objective_2") == \
+        "Speak to Doric in Dowdun Reach"
+    # ids without a text entry fall back to the id itself
+    assert quests.objective_label(dr, "Some_Unknown_Id") == "Some_Unknown_Id"
+
+
+# ---- uncompleting ---------------------------------------------------------
+
+def test_reset_quest_removes_the_save_entry():
+    sf = _sf()
+    q = _quest("Quest_CooksAssistant")
+    quests.set_state(sf, q["quest_id"], quests.STATE_COMPLETED)
+    assert quests.reset_quest(sf, q["quest_id"]) is True
+    assert sf.progress["QuestProgress"]["Quests"] == []
+    assert quests.get_states(sf) == {}
+
+
+def test_reset_quest_without_entry_is_a_noop():
+    sf = _sf()
+    assert quests.reset_quest(sf, "no-such-quest") is False
+
+
+def test_set_in_progress_from_completed_rewinds_to_first_objective():
+    sf = _sf()
+    q = _quest("Quest_CooksAssistant")
+    quests.set_state(sf, q["quest_id"], quests.STATE_COMPLETED,
+                     objective=q["objectives"][-1])
+    quests.set_in_progress(sf, q)
+    entry = sf.progress["QuestProgress"]["Quests"][0]
+    assert entry["QuestState"] == quests.STATE_IN_PROGRESS
+    assert entry["QuestObjective"] == q["objectives"][0]
+
+
+def test_set_in_progress_otherwise_keeps_the_current_objective():
+    sf = _sf()
+    q = _quest("Quest_CooksAssistant")
+    quests.set_objective(sf, q, q["objectives"][2])
+    quests.set_in_progress(sf, q)
+    entry = sf.progress["QuestProgress"]["Quests"][0]
+    assert entry["QuestObjective"] == q["objectives"][2]
+
+
+def test_set_in_progress_from_completed_objectiveless_quest():
+    sf = _sf()
+    q = _quest("Quest_Whip")   # hidden quest with no objectives
+    quests.set_state(sf, q["quest_id"], quests.STATE_COMPLETED)
+    quests.set_in_progress(sf, q)
+    entry = sf.progress["QuestProgress"]["Quests"][0]
+    assert entry["QuestState"] == quests.STATE_IN_PROGRESS
+    assert entry["QuestObjective"] is None
+
+
+def test_uncomplete_blockers_name_later_completed_main_quests_in_order():
+    sf = _sf()
+    for asset in ("Quest_DragonSlayer", "Quest_DeathQuestMain",
+                  "Quest_DR_MainQuest", "Quest_UmS_MainQuest"):
+        quests.set_state(sf, _quest(asset)["quest_id"],
+                         quests.STATE_COMPLETED)
+    assert quests.main_story_uncomplete_blockers(
+        sf, _quest("Quest_DeathQuestMain")) == [
+        "Black Knight's Fortress", "Icthlarin's Little Helper"]
+    assert quests.main_story_uncomplete_blockers(
+        sf, _quest("Quest_UmS_MainQuest")) == []
+
+
+def test_uncomplete_blockers_ignore_non_completed_and_non_main():
+    sf = _sf()
+    quests.set_state(sf, _quest("Quest_UmS_MainQuest")["quest_id"],
+                     quests.STATE_IN_PROGRESS)
+    assert quests.main_story_uncomplete_blockers(
+        sf, _quest("Quest_DragonSlayer")) == []
+    assert quests.main_story_uncomplete_blockers(
+        sf, _quest("Quest_CooksAssistant")) == []

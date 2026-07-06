@@ -94,6 +94,22 @@ def main_story_blockers(sf, quest):
     return blockers
 
 
+def main_story_uncomplete_blockers(sf, quest):
+    """Later main-story quests (names, in order) still Completed that
+    block downgrading `quest` out of Completed. Empty for non-main
+    quests — the mirror of main_story_blockers."""
+    if quest["asset"] not in MAIN_QUEST_ORDER:
+        return []
+    states = get_states(sf)
+    blockers = []
+    for asset in MAIN_QUEST_ORDER[MAIN_QUEST_ORDER.index(quest["asset"])
+                                  + 1:]:
+        later = next(q for q in EMBEDDED_QUESTS if q["asset"] == asset)
+        if states.get(later["quest_id"]) == STATE_COMPLETED:
+            blockers.append(later["name"])
+    return blockers
+
+
 def quest_by_id(quest_id):
     for q in EMBEDDED_QUESTS:
         if q["quest_id"] == quest_id:
@@ -139,6 +155,12 @@ def final_objective(quest):
     return quest["objectives"][-1] if quest["objectives"] else None
 
 
+def objective_label(quest, objective_id):
+    """Readable text for an objective id. Some quests store the text as
+    the id itself, so fall back to the id."""
+    return quest.get("objective_texts", {}).get(objective_id, objective_id)
+
+
 def display_state(quest, state, objective):
     """Label for the UI, folding in the virtual ready-to-turn-in state."""
     if (state == STATE_IN_PROGRESS and quest["objectives"]
@@ -172,6 +194,42 @@ def set_state(sf, quest_id, state, objective=_KEEP):
             "QuestBools": [],
         })
     sf.mark_dirty()
+
+
+def set_objective(sf, quest, objective_id):
+    """Jump a quest to a rung on its objective ladder: In progress with
+    `objective_id` as the current objective (everything before it on the
+    ladder is implicitly done)."""
+    if objective_id not in quest["objectives"]:
+        raise ValueError("Unknown objective for {}: {}".format(
+            quest["asset"], objective_id))
+    set_state(sf, quest["quest_id"], STATE_IN_PROGRESS,
+              objective=objective_id)
+
+
+def set_in_progress(sf, quest):
+    """Dropdown-style In progress. Coming down from Completed the kept
+    objective would be the final one and wrongly read as Ready to turn
+    in, so rewind to the first objective; otherwise keep the current
+    objective."""
+    if get_states(sf).get(quest["quest_id"]) == STATE_COMPLETED:
+        first = quest["objectives"][0] if quest["objectives"] else None
+        set_state(sf, quest["quest_id"], STATE_IN_PROGRESS, objective=first)
+    else:
+        set_state(sf, quest["quest_id"], STATE_IN_PROGRESS)
+
+
+def reset_quest(sf, quest_id):
+    """Remove a quest's save entry — the game's own representation of
+    'not started', which also drops the stale objective and quest
+    variables. Returns whether an entry existed."""
+    entries = _quest_entries(sf)
+    for i, e in enumerate(entries):
+        if isinstance(e, dict) and e.get("QuestId") == quest_id:
+            del entries[i]
+            sf.mark_dirty()
+            return True
+    return False
 
 
 def set_ready_to_turn_in(sf, quest):

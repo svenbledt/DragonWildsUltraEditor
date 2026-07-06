@@ -16,6 +16,9 @@ _STATE_COLORS = {
     quests.STATE_LABELS[quests.STATE_COMPLETED]: ("#3a7a3a", "#7ac07a"),
 }
 _STATE_CHOICES = list(_STATE_COLORS)
+_OBJ_DONE_COLOR = ("#3a7a3a", "#7ac07a")
+_OBJ_CURRENT_COLOR = ("#a07020", "#e0b060")
+_OBJ_PENDING_COLOR = ("gray45", "gray55")
 
 
 class QuestsPage(ctk.CTkFrame):
@@ -23,6 +26,7 @@ class QuestsPage(ctk.CTkFrame):
         super().__init__(master, fg_color="transparent")
         self.app = app
         self.category = TABS[0][0]
+        self._expanded = set()   # quest_ids with an open objective list
 
         top = ctk.CTkFrame(self, fg_color="transparent")
         top.pack(fill="x", pady=(8, 6))
@@ -54,10 +58,10 @@ class QuestsPage(ctk.CTkFrame):
             text="{} / {} completed".format(done, len(rows)))
         for q in rows:
             state = states.get(q["quest_id"], quests.STATE_NOT_STARTED)
-            self._card(q, quests.display_state(
-                q, state, objectives.get(q["quest_id"])))
+            self._card(q, state, objectives.get(q["quest_id"]))
 
-    def _card(self, q, state):
+    def _card(self, q, state, objective):
+        label = quests.display_state(q, state, objective)
         card = ctk.CTkFrame(self.list_frame, corner_radius=10)
         card.pack(fill="x", pady=4)
 
@@ -68,8 +72,8 @@ class QuestsPage(ctk.CTkFrame):
         ctk.CTkLabel(head, text=q["name"], anchor="w",
                      font=ctk.CTkFont(size=14, weight="bold")
                      ).pack(side="left")
-        ctk.CTkLabel(head, text=state, font=ctk.CTkFont(size=12),
-                     text_color=_STATE_COLORS[state]).pack(side="left",
+        ctk.CTkLabel(head, text=label, font=ctk.CTkFont(size=12),
+                     text_color=_STATE_COLORS[label]).pack(side="left",
                                                            padx=10)
         if q["description"]:
             ctk.CTkLabel(text, text=q["description"], anchor="w",
@@ -77,10 +81,7 @@ class QuestsPage(ctk.CTkFrame):
                          font=ctk.CTkFont(size=12),
                          text_color=("gray30", "gray70")).pack(fill="x")
         if q["objectives"]:
-            ctk.CTkLabel(text,
-                         text="{} objectives".format(len(q["objectives"])),
-                         anchor="w", font=ctk.CTkFont(size=11),
-                         text_color=("gray45", "gray55")).pack(fill="x")
+            self._objectives_block(text, q, state, objective)
         if q["rewards"]:
             self._rewards_line(text, q)
 
@@ -92,11 +93,84 @@ class QuestsPage(ctk.CTkFrame):
                           text_color=("gray20", "gray80"),
                           command=lambda: self._give_rewards(q)
                           ).pack(pady=(0, 6))
-        var = ctk.StringVar(value=state)
+        var = ctk.StringVar(value=label)
         ctk.CTkOptionMenu(
             actions, variable=var, width=140, values=_STATE_CHOICES,
             command=lambda label, quest=q: self._set_state(
                 quest, label)).pack()
+
+    def _objectives_block(self, parent, q, state, objective):
+        expanded = q["quest_id"] in self._expanded
+        toggle = ctk.CTkLabel(
+            parent, text="{} Objectives ({})".format(
+                "▾" if expanded else "▸", len(q["objectives"])),
+            anchor="w", font=ctk.CTkFont(size=11),
+            text_color=("gray45", "gray55"), cursor="hand2")
+        toggle.pack(fill="x")
+        toggle.bind("<Button-1>",
+                    lambda e, qid=q["quest_id"]: self._toggle_objectives(qid))
+        if not expanded:
+            return
+        # ladder position: rows above the current objective are done
+        if state == quests.STATE_COMPLETED:
+            current = len(q["objectives"])
+        elif (state == quests.STATE_IN_PROGRESS
+                and objective in q["objectives"]):
+            current = q["objectives"].index(objective)
+        else:
+            current = -1
+        for i, obj in enumerate(q["objectives"]):
+            if i < current or state == quests.STATE_COMPLETED:
+                symbol, color = "✓", _OBJ_DONE_COLOR
+            elif i == current:
+                symbol, color = "●", _OBJ_CURRENT_COLOR
+            else:
+                symbol, color = "○", _OBJ_PENDING_COLOR
+            row = ctk.CTkLabel(
+                parent, text="    {} {}".format(
+                    symbol, quests.objective_label(q, obj)),
+                anchor="w", justify="left", wraplength=500,
+                font=ctk.CTkFont(size=11), text_color=color, cursor="hand2")
+            row.pack(fill="x")
+            row.bind("<Button-1>", lambda e, quest=q, oid=obj:
+                     self._jump_objective(quest, oid))
+
+    def _toggle_objectives(self, quest_id):
+        if quest_id in self._expanded:
+            self._expanded.discard(quest_id)
+        else:
+            self._expanded.add(quest_id)
+        self.refresh()
+
+    def _jump_objective(self, q, objective_id):
+        sf = self.app.save
+        # leaving Completed must respect main story order downwards
+        if quests.get_states(sf).get(q["quest_id"]) == quests.STATE_COMPLETED:
+            blockers = quests.main_story_uncomplete_blockers(sf, q)
+            if blockers:
+                self.app.set_status(
+                    "Blocked: uncomplete {} first (main story order)."
+                    .format(", ".join(blockers)))
+                return
+        # the final objective is 'Ready to turn in' — same forward rule
+        if objective_id == quests.final_objective(q):
+            blockers = quests.main_story_blockers(sf, q)
+            if blockers:
+                self.app.set_status(
+                    "Blocked: complete {} first (main story order)."
+                    .format(", ".join(blockers)))
+                return
+        quests.set_objective(sf, q, objective_id)
+        if objective_id == quests.final_objective(q):
+            self.app.set_status(
+                "Quest set to its final objective — turn it in at the NPC "
+                "to receive the rewards in-game. Press Save to keep.")
+        else:
+            self.app.set_status(
+                "Quest set to objective: {} — press Save to keep.".format(
+                    quests.objective_label(q, objective_id)))
+        self.app.mark_dirty()
+        self.refresh()
 
     def _rewards_line(self, parent, q):
         line = ctk.CTkFrame(parent, fg_color="transparent")
@@ -126,27 +200,47 @@ class QuestsPage(ctk.CTkFrame):
         self.refresh()
 
     def _set_state(self, q, label):
+        sf = self.app.save
         # main story must be completed in order — a later main quest can't
         # be completed or made turn-in-ready over an incomplete predecessor
         if label in (quests.READY_LABEL,
                      quests.STATE_LABELS[quests.STATE_COMPLETED]):
-            blockers = quests.main_story_blockers(self.app.save, q)
+            blockers = quests.main_story_blockers(sf, q)
             if blockers:
                 self.app.set_status(
                     "Blocked: complete {} first (main story order)."
                     .format(", ".join(blockers)))
                 self.refresh()
                 return
+        # ...and uncompleted in reverse order — an earlier main quest can't
+        # be downgraded while a later one is still Completed
+        else:
+            if (quests.get_states(sf).get(q["quest_id"])
+                    == quests.STATE_COMPLETED):
+                blockers = quests.main_story_uncomplete_blockers(sf, q)
+                if blockers:
+                    self.app.set_status(
+                        "Blocked: uncomplete {} first (main story order)."
+                        .format(", ".join(blockers)))
+                    self.refresh()
+                    return
         if label == quests.READY_LABEL:
-            quests.set_ready_to_turn_in(self.app.save, q)
+            quests.set_ready_to_turn_in(sf, q)
             self.app.set_status(
                 "Quest set to its final objective — turn it in at the NPC "
                 "to receive the rewards in-game. Press Save to keep.")
-        else:
-            state = {v: k for k, v in quests.STATE_LABELS.items()}[label]
-            quests.set_state(self.app.save, q["quest_id"], state)
+        elif label == quests.STATE_LABELS[quests.STATE_NOT_STARTED]:
+            quests.reset_quest(sf, q["quest_id"])
             self.app.set_status(
-                "Quest set to {} — press Save to keep.".format(label))
+                "Quest reset to Not started — press Save to keep.")
+        elif label == quests.STATE_LABELS[quests.STATE_IN_PROGRESS]:
+            quests.set_in_progress(sf, q)
+            self.app.set_status(
+                "Quest set to In progress — press Save to keep.")
+        else:
+            quests.set_state(sf, q["quest_id"], quests.STATE_COMPLETED)
+            self.app.set_status(
+                "Quest set to Completed — press Save to keep.")
         self.app.mark_dirty()
         self.refresh()
 
