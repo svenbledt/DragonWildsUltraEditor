@@ -73,6 +73,16 @@ if errorlevel 1 ( echo [ERROR] Installing requirements.txt failed. & goto :fail 
 if errorlevel 1 ( echo [ERROR] Installing Nuitka failed. & goto :fail )
 
 REM --- 4. Clean previous build output -------------------------
+REM  A running editor locks its exe and (on older builds) icon pngs
+REM  inside dist\, which makes the rmdir below fail half-way and the
+REM  final Compress-Archive die on a locked file. /FO CSV: the default
+REM  table truncates long image names, so find would never match.
+tasklist /FI "IMAGENAME eq %APPNAME%.exe" /NH /FO CSV 2>nul | find /I "%APPNAME%.exe" >nul
+if not errorlevel 1 (
+    echo [ERROR] %APPNAME%.exe is running. Close the editor first -
+    echo         it locks files in dist\, so cleaning/zipping fails.
+    goto :fail
+)
 echo [4/6] Cleaning previous build artifacts ...
 if exist "%BUILDDIR%" rmdir /s /q "%BUILDDIR%"
 if exist "dist\main.build" rmdir /s /q "dist\main.build"

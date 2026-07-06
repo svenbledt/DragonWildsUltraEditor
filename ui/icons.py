@@ -41,7 +41,11 @@ def get_icon(pid, size=32):
     filename = _load_manifest().get(pid)
     if filename:
         try:
-            pil = Image.open(os.path.join(_ICON_DIR, filename))
+            # load pixels and release the file handle immediately — a lazy
+            # Image.open keeps the png locked for the app's lifetime, which
+            # breaks zipping/replacing a dist folder while the exe runs
+            with Image.open(os.path.join(_ICON_DIR, filename)) as f:
+                pil = f.copy()
             img = ctk.CTkImage(light_image=pil, dark_image=pil,
                                size=(size, size))
         except Exception:

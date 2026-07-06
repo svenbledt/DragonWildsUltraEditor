@@ -53,6 +53,11 @@ where dotnet >nul 2>nul
 if errorlevel 1 ( echo %RD%[ERROR]%R% 'dotnet' not found. Install the .NET 10 SDK. & goto :fail )
 where py >nul 2>nul
 if errorlevel 1 ( echo %RD%[ERROR]%R% Python launcher 'py' not found. Install Python 3. & goto :fail )
+REM  fail here, not 10 minutes in: a running editor locks dist\ files
+REM  and step 5's clean + zip would die on them (/FO CSV because the
+REM  default tasklist table truncates the long image name)
+tasklist /FI "IMAGENAME eq DragonWildsUltraEditor.exe" /NH /FO CSV 2>nul | find /I "DragonWildsUltraEditor.exe" >nul
+if not errorlevel 1 ( echo %RD%[ERROR]%R% DragonWildsUltraEditor.exe is running - close the editor first, it locks files in dist\. & goto :fail )
 
 call :epoch
 set "PIPE_START=!EPOCH!"
