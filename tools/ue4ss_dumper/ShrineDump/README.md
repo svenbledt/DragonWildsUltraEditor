@@ -2,7 +2,8 @@
 
 Extracts the **complete** set of Sanguine Urns straight from the cooked game
 files, so we don't have to roam the whole map in-game. This is how the 18 urn
-GUIDs in `../build_shrine_ids.py` (`KNOWN_SHRINE_IDS`) were obtained.
+GUIDs in `../build_shrine_ids.py` (`KNOWN_SHRINE_IDS`) were obtained (path is
+relative to `tools/ue4ss_dumper/`).
 
 ## What it does
 
@@ -47,8 +48,8 @@ for `build_shrine_ids.py`.
 ## Folding results back in
 
 ```
-cp shrines.jsonl ue4ss_dumper/ItemDumper_urns.jsonl
-py ue4ss_dumper/build_shrine_ids.py     # regenerates ../shrine_ids.py
+cp shrines.jsonl tools/ue4ss_dumper/ItemDumper_urns.jsonl
+py tools/ue4ss_dumper/build_shrine_ids.py     # regenerates data/shrine_ids.py
 ```
 
 If the game updates and adds urns, re-run this (regenerate the usmap first) and

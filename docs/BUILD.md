@@ -72,7 +72,7 @@ Flag notes:
 - `--standalone` emits a folder (app exe + its DLLs). Adding `--onefile` would
   collapse it into a single exe, but that reintroduces the self-extracting stub
   the AV heuristics dislike — so we don't.
-- `ue4ss_dumper/` is dev-only and is NOT imported by `main.py`, so it is never
+- `tools/ue4ss_dumper/` is dev-only and is NOT imported by `main.py`, so it is never
   bundled.
 
 ## 3. Smoke-check the build

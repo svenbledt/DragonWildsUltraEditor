@@ -1,7 +1,7 @@
 # ItemDumper — regenerate item_ids.py and the recipe list from the live game
 
 This folder holds a small UE4SS Lua mod plus helper scripts that dump the game's
-complete item list **and recipe list** straight out of memory, so `item_ids.py`
+complete item list **and recipe list** straight out of memory, so `data/item_ids.py`
 and the recipe unlocker's `EMBEDDED_RECIPE_IDS` can be rebuilt after any
 Dragonwilds update (including content you haven't unlocked yet).
 
@@ -13,7 +13,7 @@ file (`ItemDumper_recipes.jsonl`) and their own converter (`build_recipe_ids.py`
 which holds ONLY per-variant refs of the form `MountDataAsset:<assetname>`
 (e.g. `MountDataAsset:DA_Mount_Terrorbird_00_00`). The dumper enumerates the
 `MountDataAsset` objects (`ItemDumper_mounts.jsonl`) and `build_mount_ids.py`
-builds those exact ref strings into `EMBEDDED_MOUNT_TAGS` in `tab_extra.py`,
+builds those exact ref strings into `EMBEDDED_MOUNT_TAGS` in `data/unlock_ids.py`,
 powering the "Unlock all mounts" button.
 
 > ⚠️ Do NOT put `TAG.Mounts.Type.*` gameplay tags in `MountsUnlockedList` -
@@ -24,7 +24,7 @@ powering the "Unlock all mounts" button.
 **Buildings** are unlocked via `Progress.BuildingsUnlocked` — a **separate id
 namespace** from both items and recipes (zero overlap). The dumper scans for the
 building asset class (`ItemDumper_buildings.jsonl`) and `build_building_ids.py`
-builds `EMBEDDED_BUILDING_IDS` in `tab_extra.py`, powering the "Unlock all
+builds `EMBEDDED_BUILDING_IDS` in `data/unlock_ids.py`, powering the "Unlock all
 buildings" button. Because the class name isn't known up front, the mod probes
 many candidate names; the converter then **confirms** the real building class by
 overlap with your saves' `BuildingsUnlocked` (so an accidental non-building match
@@ -46,7 +46,7 @@ One F8 press dumps all four (items, recipes, mounts, buildings).
   folder. The project is on `C:` and the game on `F:`, so a real hardlink is
   impossible (hardlinks can't cross drives); a **directory junction** is used
   instead — same effect: edits in the project appear instantly in the game.
-- `build_item_ids.py` / `build_item_ids.bat` — turn the dump into `item_ids.py`.
+- `build_item_ids.py` / `build_item_ids.bat` — turn the dump into `data/item_ids.py`.
 
 ## One-time / after-every-update
 1. Run `setup_dumper_link.bat` (recreates `…\ue4ss\Mods\ItemDumper` -> this folder).
@@ -62,5 +62,5 @@ One F8 press dumps all four (items, recipes, mounts, buildings).
    - `ItemDumper_diagnostics.txt` — class chain + per-class counts (for debugging)
 3. Run `build_item_ids.bat` — copies the dump here and prints an analysis
    (record count, new vs. known items, name-match check). If it looks right,
-   run `py build_item_ids.py` to write the new `item_ids.py` (old one is backed
-   up to `item_ids.py.bak`).
+   run `py build_item_ids.py` to write the new `data/item_ids.py` (old one is
+   backed up to `data/item_ids.py.bak`).

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-build_recipe_ids.py - rebuild EMBEDDED_RECIPE_IDS in tab_extra.py from the
+build_recipe_ids.py - rebuild EMBEDDED_RECIPE_IDS in data/unlock_ids.py from the
 ItemDumper recipe dump (ItemDumper_recipes.jsonl).
 
 Recipes are a separate asset class / id namespace from items, so they get their
@@ -8,7 +8,7 @@ own dump file and their own converter. This script:
   * reads the dumped recipe PersistenceIDs,
   * validates them against the recipes already known from save files + the
     current embedded list (they should be a SUPERSET),
-  * rewrites the EMBEDDED_RECIPE_IDS list in tab_extra.py to the union
+  * rewrites the EMBEDDED_RECIPE_IDS list in data/unlock_ids.py to the union
     (never drops a known-good recipe).
 """
 import argparse
@@ -29,7 +29,7 @@ JUNK_RE = re.compile(
     r"placeholder|prototype|futuremajorversion|sandbox|scratch|/dev/|example)")
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-PROJECT = os.path.dirname(HERE)
+PROJECT = os.path.dirname(os.path.dirname(HERE))  # repo root
 GAME_WIN64 = r"F:\SteamLibrary\steamapps\common\RSDragonwilds\RSDragonwilds\Binaries\Win64"
 DUMP_CANDIDATES = [
     os.path.join(HERE, "ItemDumper_recipes.jsonl"),
@@ -71,11 +71,11 @@ def known_recipe_ids():
     try:
         sys.path.insert(0, PROJECT)
         import importlib
-        import tab_extra
-        importlib.reload(tab_extra)
-        ids |= set(tab_extra.EMBEDDED_RECIPE_IDS)
+        import data.unlock_ids
+        importlib.reload(data.unlock_ids)
+        ids |= set(data.unlock_ids.EMBEDDED_RECIPE_IDS)
     except Exception as e:
-        print(f"  (could not import tab_extra: {e})")
+        print(f"  (could not import data.unlock_ids: {e})")
     savedir = os.path.join(os.environ.get("LOCALAPPDATA", ""),
                            "RSDragonwilds", "Saved", "SaveCharacters")
     for s in glob.glob(os.path.join(savedir, "*.json")):
@@ -94,20 +94,34 @@ def known_recipe_ids():
     return ids
 
 
-def rewrite(recipe_ids):
-    path = os.path.join(PROJECT, "tab_extra.py")
+def rewrite(recipe_ids, path=None):
+    """Span-aware rewrite of EMBEDDED_RECIPE_IDS in data/unlock_ids.py.
+
+    The assignment there is pretty-printed across many lines (one id per
+    line), so we can't just replace a single line: we replace every line from
+    the one starting with "EMBEDDED_RECIPE_IDS = [" through the first
+    subsequent line whose stripped content ends with "]" (inclusive), with a
+    single new single-line assignment.
+    """
+    if path is None:
+        path = os.path.join(PROJECT, "data", "unlock_ids.py")
     with open(path, encoding="utf-8") as f:
         lines = f.readlines()
     new = "EMBEDDED_RECIPE_IDS = [" + ", ".join("'" + i + "'" for i in recipe_ids) + "]\n"
-    out, done = [], False
-    for ln in lines:
-        if ln.startswith("EMBEDDED_RECIPE_IDS ="):
+    out, i, done = [], 0, False
+    while i < len(lines):
+        ln = lines[i]
+        if not done and ln.startswith("EMBEDDED_RECIPE_IDS ="):
             out.append(new)
             done = True
-        else:
-            out.append(ln)
+            while i < len(lines) and not lines[i].strip().endswith("]"):
+                i += 1
+            i += 1
+            continue
+        out.append(ln)
+        i += 1
     if not done:
-        raise RuntimeError("EMBEDDED_RECIPE_IDS assignment not found in tab_extra.py")
+        raise RuntimeError("EMBEDDED_RECIPE_IDS assignment not found in data/unlock_ids.py")
     with open(path + ".bak", "w", encoding="utf-8") as b, open(path, encoding="utf-8") as a:
         b.write(a.read())
     with open(path, "w", encoding="utf-8") as f:
@@ -174,7 +188,7 @@ def main():
         print("\n--dry-run: not writing.")
         return
     rewrite(final)
-    print(f"Rewrote EMBEDDED_RECIPE_IDS in tab_extra.py ({len(final)} recipes), backup .bak")
+    print(f"Rewrote EMBEDDED_RECIPE_IDS in data/unlock_ids.py ({len(final)} recipes), backup .bak")
 
 
 if __name__ == "__main__":

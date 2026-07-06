@@ -1,6 +1,6 @@
 """Embedded unlock-id snapshots (moved from tab_extra.py).
 
-Strict-mode-safe id lists dumped from the game (see ue4ss_dumper/build_*.py).
+Strict-mode-safe id lists dumped from the game (see tools/ue4ss_dumper/build_*.py).
 Regenerate after game updates.
 """
 

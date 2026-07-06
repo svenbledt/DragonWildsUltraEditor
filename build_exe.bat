@@ -12,7 +12,7 @@ REM
 REM  Uses an isolated build venv (.venv-build) so it never
 REM  touches your global Python. Bundles CustomTkinter, the
 REM  data\icons item-icon set, and the app icon/about image.
-REM  ue4ss_dumper\ is dev-only and is NOT bundled (main.py never
+REM  tools\ue4ss_dumper\ is dev-only and is NOT bundled (main.py never
 REM  imports it).
 REM
 REM  Requires a C compiler. This build was verified with MSVC

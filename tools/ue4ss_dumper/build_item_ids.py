@@ -23,7 +23,7 @@ import re
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-PROJECT = os.path.dirname(HERE)  # item_ids.py lives one level up
+PROJECT = os.path.dirname(os.path.dirname(HERE))  # repo root; data/item_ids.py lives under data/
 GAME_WIN64 = r"F:\SteamLibrary\steamapps\common\RSDragonwilds\RSDragonwilds\Binaries\Win64"
 DEFAULT_DUMP_CANDIDATES = [
     os.path.join(HERE, "ItemDumper_items.jsonl"),
@@ -127,7 +127,7 @@ def load_existing():
     try:
         sys.path.insert(0, PROJECT)
         import importlib
-        import item_ids
+        import data.item_ids as item_ids
         importlib.reload(item_ids)
         return list(item_ids.ITEM_LIST)
     except Exception as e:
@@ -237,7 +237,7 @@ def main():
         return
 
     merged = list(existing) + new_entries
-    out = os.path.join(PROJECT, "item_ids.py")
+    out = os.path.join(PROJECT, "data", "item_ids.py")
     if os.path.isfile(out):
         with open(out, "r", encoding="utf-8") as a, open(out + ".bak", "w", encoding="utf-8") as b:
             b.write(a.read())

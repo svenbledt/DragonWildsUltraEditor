@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-build_building_ids.py - rebuild EMBEDDED_BUILDING_IDS in tab_extra.py from the
+build_building_ids.py - rebuild EMBEDDED_BUILDING_IDS in data/unlock_ids.py from the
 ItemDumper building dump (ItemDumper_buildings.jsonl).
 
 Build pieces are unlocked in the save via Progress.BuildingsUnlocked - a SEPARATE
@@ -36,7 +36,7 @@ JUNK_RE = re.compile(
 NAME_HINT_RE = re.compile(r"(?i)(build|buildable|construct|structure|placeable)")
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-PROJECT = os.path.dirname(HERE)
+PROJECT = os.path.dirname(os.path.dirname(HERE))  # repo root
 GAME_WIN64 = r"F:\SteamLibrary\steamapps\common\RSDragonwilds\RSDragonwilds\Binaries\Win64"
 DUMP_CANDIDATES = [
     os.path.join(HERE, "ItemDumper_buildings.jsonl"),
@@ -96,28 +96,42 @@ def embedded_buildings():
     try:
         sys.path.insert(0, PROJECT)
         import importlib
-        import tab_extra
-        importlib.reload(tab_extra)
-        return set(getattr(tab_extra, "EMBEDDED_BUILDING_IDS", []))
+        import data.unlock_ids
+        importlib.reload(data.unlock_ids)
+        return set(getattr(data.unlock_ids, "EMBEDDED_BUILDING_IDS", []))
     except Exception as e:
-        print(f"  (could not import tab_extra: {e})")
+        print(f"  (could not import data.unlock_ids: {e})")
         return set()
 
 
-def rewrite(building_ids):
-    path = os.path.join(PROJECT, "tab_extra.py")
+def rewrite(building_ids, path=None):
+    """Span-aware rewrite of EMBEDDED_BUILDING_IDS in data/unlock_ids.py.
+
+    The assignment there is pretty-printed across many lines (one id per
+    line), so we can't just replace a single line: we replace every line from
+    the one starting with "EMBEDDED_BUILDING_IDS = [" through the first
+    subsequent line whose stripped content ends with "]" (inclusive), with a
+    single new single-line assignment.
+    """
+    if path is None:
+        path = os.path.join(PROJECT, "data", "unlock_ids.py")
     with open(path, encoding="utf-8") as f:
         lines = f.readlines()
     new = "EMBEDDED_BUILDING_IDS = [" + ", ".join("'" + i + "'" for i in building_ids) + "]\n"
-    out, done = [], False
-    for ln in lines:
-        if ln.startswith("EMBEDDED_BUILDING_IDS ="):
+    out, i, done = [], 0, False
+    while i < len(lines):
+        ln = lines[i]
+        if not done and ln.startswith("EMBEDDED_BUILDING_IDS ="):
             out.append(new)
             done = True
-        else:
-            out.append(ln)
+            while i < len(lines) and not lines[i].strip().endswith("]"):
+                i += 1
+            i += 1
+            continue
+        out.append(ln)
+        i += 1
     if not done:
-        raise RuntimeError("EMBEDDED_BUILDING_IDS assignment not found in tab_extra.py")
+        raise RuntimeError("EMBEDDED_BUILDING_IDS assignment not found in data/unlock_ids.py")
     with open(path + ".bak", "w", encoding="utf-8") as b, open(path, encoding="utf-8") as a:
         b.write(a.read())
     with open(path, "w", encoding="utf-8") as f:
@@ -199,7 +213,7 @@ def main():
         print("\n--dry-run: not writing.")
         return
     rewrite(final)
-    print(f"Rewrote EMBEDDED_BUILDING_IDS in tab_extra.py ({len(final)}), backup .bak")
+    print(f"Rewrote EMBEDDED_BUILDING_IDS in data/unlock_ids.py ({len(final)}), backup .bak")
 
 
 if __name__ == "__main__":

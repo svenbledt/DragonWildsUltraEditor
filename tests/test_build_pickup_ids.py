@@ -15,7 +15,7 @@ def _load(mod_name, rel_path):
 
 class KeepRecordTests(unittest.TestCase):
     def setUp(self):
-        self.b = _load("build_pickup_ids", "ue4ss_dumper/build_pickup_ids.py")
+        self.b = _load("build_pickup_ids", "tools/ue4ss_dumper/build_pickup_ids.py")
 
     def test_keeps_normal_item(self):
         rec = {"PersistenceID": "good1", "SourceString": "Healing Potion",
@@ -53,8 +53,8 @@ class KeepRecordTests(unittest.TestCase):
 class RealDumpTests(unittest.TestCase):
     """Guards against filter regressions using the checked-in dump."""
     def setUp(self):
-        self.b = _load("build_pickup_ids", "ue4ss_dumper/build_pickup_ids.py")
-        self.recs = self.b.load_records(os.path.join(ROOT, "ue4ss_dumper", "ItemDumper_items.jsonl"))
+        self.b = _load("build_pickup_ids", "tools/ue4ss_dumper/build_pickup_ids.py")
+        self.recs = self.b.load_records(os.path.join(ROOT, "tools", "ue4ss_dumper", "ItemDumper_items.jsonl"))
 
     def test_expected_count(self):
         self.assertEqual(len(self.b.build_ids(self.recs)), 1365)
