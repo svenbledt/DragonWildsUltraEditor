@@ -62,11 +62,36 @@ def pretty_asset(asset):
     return " ".join(words) or asset
 
 
+# Main-story progression in expansion order: Bramblemead -> Fellhollow ->
+# Dowdun Reach -> Umbral Sands (Black Knight's Fortress "unlock[s] your way
+# through to the Umbral Sands" per its own quest description).
+MAIN_QUEST_ORDER = ["Quest_DragonSlayer", "Quest_DeathQuestMain",
+                    "Quest_DR_MainQuest", "Quest_UmS_MainQuest"]
+
+
 def quests(category=None):
-    """Embedded quest list (already sorted main/side/tutorial, by name)."""
+    """Embedded quest list; main quests come in story order."""
     if category is None:
         return list(EMBEDDED_QUESTS)
-    return [q for q in EMBEDDED_QUESTS if q["category"] == category]
+    rows = [q for q in EMBEDDED_QUESTS if q["category"] == category]
+    if category == "main":
+        rows.sort(key=lambda q: MAIN_QUEST_ORDER.index(q["asset"])
+                  if q["asset"] in MAIN_QUEST_ORDER else len(MAIN_QUEST_ORDER))
+    return rows
+
+
+def main_story_blockers(sf, quest):
+    """Earlier main-story quests (names, in order) not yet Completed that
+    block completing/turning in `quest`. Empty for non-main quests."""
+    if quest["asset"] not in MAIN_QUEST_ORDER:
+        return []
+    states = get_states(sf)
+    blockers = []
+    for asset in MAIN_QUEST_ORDER[:MAIN_QUEST_ORDER.index(quest["asset"])]:
+        pre = next(q for q in EMBEDDED_QUESTS if q["asset"] == asset)
+        if states.get(pre["quest_id"]) != STATE_COMPLETED:
+            blockers.append(pre["name"])
+    return blockers
 
 
 def quest_by_id(quest_id):

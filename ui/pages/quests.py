@@ -126,6 +126,17 @@ class QuestsPage(ctk.CTkFrame):
         self.refresh()
 
     def _set_state(self, q, label):
+        # main story must be completed in order — a later main quest can't
+        # be completed or made turn-in-ready over an incomplete predecessor
+        if label in (quests.READY_LABEL,
+                     quests.STATE_LABELS[quests.STATE_COMPLETED]):
+            blockers = quests.main_story_blockers(self.app.save, q)
+            if blockers:
+                self.app.set_status(
+                    "Blocked: complete {} first (main story order)."
+                    .format(", ".join(blockers)))
+                self.refresh()
+                return
         if label == quests.READY_LABEL:
             quests.set_ready_to_turn_in(self.app.save, q)
             self.app.set_status(

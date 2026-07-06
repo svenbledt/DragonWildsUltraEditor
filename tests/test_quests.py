@@ -179,3 +179,40 @@ def test_ready_on_objectiveless_quest_is_plain_in_progress():
     assert entry["QuestState"] == quests.STATE_IN_PROGRESS
     assert entry["QuestObjective"] is None
     assert quests.display_state(q, 1, None) == "In progress"
+
+
+def test_main_quests_listed_in_story_order():
+    assert [q["asset"] for q in quests.quests("main")] == [
+        "Quest_DragonSlayer", "Quest_DeathQuestMain",
+        "Quest_DR_MainQuest", "Quest_UmS_MainQuest"]
+
+
+def test_main_story_blockers_names_all_incomplete_predecessors():
+    sf = _sf()
+    last = _quest("Quest_UmS_MainQuest")
+    assert quests.main_story_blockers(sf, last) == [
+        "Dragon Slayer", "Withering Heights", "Black Knight's Fortress"]
+    quests.set_state(sf, _quest("Quest_DragonSlayer")["quest_id"],
+                     quests.STATE_COMPLETED)
+    assert quests.main_story_blockers(sf, last) == [
+        "Withering Heights", "Black Knight's Fortress"]
+
+
+def test_main_story_blockers_empty_when_predecessors_complete():
+    sf = _sf()
+    for asset in ("Quest_DragonSlayer", "Quest_DeathQuestMain",
+                  "Quest_DR_MainQuest"):
+        quests.set_state(sf, _quest(asset)["quest_id"],
+                         quests.STATE_COMPLETED)
+    assert quests.main_story_blockers(sf, _quest("Quest_UmS_MainQuest")) == []
+    # in-progress predecessor still blocks
+    quests.set_state(sf, _quest("Quest_DR_MainQuest")["quest_id"],
+                     quests.STATE_IN_PROGRESS)
+    assert quests.main_story_blockers(
+        sf, _quest("Quest_UmS_MainQuest")) == ["Black Knight's Fortress"]
+
+
+def test_first_main_quest_and_side_quests_never_blocked():
+    sf = _sf()
+    assert quests.main_story_blockers(sf, _quest("Quest_DragonSlayer")) == []
+    assert quests.main_story_blockers(sf, _quest("Quest_CooksAssistant")) == []
