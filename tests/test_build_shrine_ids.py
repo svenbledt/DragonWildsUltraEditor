@@ -15,7 +15,7 @@ def _load(mod_name, rel_path):
 
 class ShrineBuildTests(unittest.TestCase):
     def setUp(self):
-        self.b = _load("build_shrine_ids", "tools/ue4ss_dumper/build_shrine_ids.py")
+        self.b = _load("build_shrine_ids", "tools/game_dump/build_shrine_ids.py")
 
     def test_known_ids_are_hex_guids(self):
         # The complete set is 18, extracted authoritatively from the cooked game

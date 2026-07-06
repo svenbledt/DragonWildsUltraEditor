@@ -46,7 +46,7 @@ class BuildUnlockRewriteTests(unittest.TestCase):
         with open(REAL_UNLOCK_IDS, "r", encoding="utf-8") as f:
             self.original_text = f.read()
         shutil.copy(REAL_UNLOCK_IDS, self.tmp_unlock_ids)
-        self.mod = _load("build_recipe_ids", "tools/ue4ss_dumper/build_recipe_ids.py")
+        self.mod = _load("build_recipe_ids", "tools/game_dump/build_recipe_ids.py")
 
     def test_rewrite_replaces_only_target_list(self):
         new_ids = ["NewRecipeId1", "NewRecipeId2"]
