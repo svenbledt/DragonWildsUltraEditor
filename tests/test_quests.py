@@ -50,10 +50,34 @@ def test_set_state_creates_gamelike_entry():
     quests.set_state(sf, qid, quests.STATE_COMPLETED)
     entry = [e for e in sf.progress["QuestProgress"]["Quests"]
              if e["QuestId"] == qid][0]
-    assert entry == {"QuestId": qid, "QuestState": 2, "QuestObjective": None,
+    # the game serializes no-objective as the FName string "None" — a JSON
+    # null here makes the game drop the entry / corrupt the load
+    assert entry == {"QuestId": qid, "QuestState": 2,
+                     "QuestObjective": "None",
                      "QuestInts": [], "QuestBools": []}
     assert quests.get_states(sf)[qid] == quests.STATE_COMPLETED
     assert sf.dirty is True
+
+
+def test_no_null_objective_is_ever_written():
+    sf = _sf()
+    whip = _quest("Quest_Whip")            # no objectives
+    cooks = _quest("Quest_CooksAssistant")
+    quests.set_state(sf, cooks["quest_id"], quests.STATE_IN_PROGRESS,
+                     objective=None)       # explicit None
+    quests.set_ready_to_turn_in(sf, whip)  # final_objective is None
+    quests.set_state(sf, whip["quest_id"], quests.STATE_COMPLETED)
+    quests.set_in_progress(sf, whip)       # objectiveless rewind
+    quests.complete_all(sf, "side")
+    for e in sf.progress["QuestProgress"]["Quests"]:
+        assert isinstance(e["QuestObjective"], str), e
+
+
+def test_get_objectives_reads_none_string_as_no_objective():
+    sf = _sf()
+    q = _quest("Quest_CooksAssistant")
+    quests.set_state(sf, q["quest_id"], quests.STATE_IN_PROGRESS)
+    assert quests.get_objectives(sf)[q["quest_id"]] is None
 
 
 def test_set_state_updates_existing_entry_preserving_variables():
@@ -179,7 +203,7 @@ def test_ready_on_objectiveless_quest_is_plain_in_progress():
     quests.set_ready_to_turn_in(sf, q)
     entry = sf.progress["QuestProgress"]["Quests"][0]
     assert entry["QuestState"] == quests.STATE_IN_PROGRESS
-    assert entry["QuestObjective"] is None
+    assert entry["QuestObjective"] == "None"
     assert quests.display_state(q, 1, None) == "In progress"
 
 
@@ -218,6 +242,31 @@ def test_first_main_quest_and_side_quests_never_blocked():
     sf = _sf()
     assert quests.main_story_blockers(sf, _quest("Quest_DragonSlayer")) == []
     assert quests.main_story_blockers(sf, _quest("Quest_CooksAssistant")) == []
+
+
+# ---- objective story order ------------------------------------------------
+
+def test_objectives_follow_story_order_not_dump_order():
+    # dump order lists the shard sub-steps AFTER the ending; the numeric
+    # ids encode the real ladder (verified: real completed save ends at
+    # _6, wiki walkthrough has Speak To Death as the intro step)
+    o = _quest("Quest_DR_MainQuest")["objectives"]
+    assert o[0] == "DR_Main_Objective_-1"          # Speak To Death intro
+    assert o[-1] == "DR_Main_Objective_6"          # completes at the stone
+    assert o.index("DR_Main_Objective_4_13") < o.index("DR_Main_Objective_5")
+    assert o.index("DR_Main_Objective_4_-1") == \
+        o.index("DR_Main_Objective_4") + 1
+    assert quests.final_objective(_quest("Quest_DR_MainQuest")) == \
+        "DR_Main_Objective_6"
+
+
+def test_text_id_objectives_keep_dump_order():
+    slayer = _quest("Quest_DragonSlayer")["objectives"]
+    assert slayer[0] == "Claim a bed"
+    assert slayer[-1] == "Return to the Wise old man after killing velgar"
+    assert _quest("Quest_DeathQuestMain")["objectives"][-1] == "ReturnToDeath"
+    cooks = _quest("Quest_CooksAssistant")["objectives"]
+    assert cooks[0] == "Objective1" and cooks[-1] == "Objective5"
 
 
 # ---- objective ladder -----------------------------------------------------
@@ -300,7 +349,7 @@ def test_set_in_progress_from_completed_objectiveless_quest():
     quests.set_in_progress(sf, q)
     entry = sf.progress["QuestProgress"]["Quests"][0]
     assert entry["QuestState"] == quests.STATE_IN_PROGRESS
-    assert entry["QuestObjective"] is None
+    assert entry["QuestObjective"] == "None"
 
 
 def test_uncomplete_blockers_name_later_completed_main_quests_in_order():
@@ -314,6 +363,37 @@ def test_uncomplete_blockers_name_later_completed_main_quests_in_order():
         "Black Knight's Fortress", "Icthlarin's Little Helper"]
     assert quests.main_story_uncomplete_blockers(
         sf, _quest("Quest_UmS_MainQuest")) == []
+
+
+def test_rewind_removes_later_non_completed_main_quest_entries():
+    sf = _sf()
+    quests.set_state(sf, _quest("Quest_DragonSlayer")["quest_id"],
+                     quests.STATE_COMPLETED)
+    quests.set_state(sf, _quest("Quest_DeathQuestMain")["quest_id"],
+                     quests.STATE_IN_PROGRESS)
+    quests.set_objective(sf, _quest("Quest_DR_MainQuest"),
+                         _quest("Quest_DR_MainQuest")["objectives"][0])
+    # rewinding the story to Dragon Slayer resets both later active quests
+    names = quests.rewind_later_main_quests(sf, _quest("Quest_DragonSlayer"))
+    assert names == ["Withering Heights", "Black Knight's Fortress"]
+    states = quests.get_states(sf)
+    assert _quest("Quest_DeathQuestMain")["quest_id"] not in states
+    assert _quest("Quest_DR_MainQuest")["quest_id"] not in states
+
+
+def test_rewind_keeps_later_completed_main_quests_and_non_main():
+    sf = _sf()
+    quests.set_state(sf, _quest("Quest_UmS_MainQuest")["quest_id"],
+                     quests.STATE_COMPLETED)
+    quests.set_state(sf, _quest("Quest_CooksAssistant")["quest_id"],
+                     quests.STATE_IN_PROGRESS)
+    assert quests.rewind_later_main_quests(
+        sf, _quest("Quest_DragonSlayer")) == []
+    states = quests.get_states(sf)
+    assert states[_quest("Quest_UmS_MainQuest")["quest_id"]] == 2
+    assert states[_quest("Quest_CooksAssistant")["quest_id"]] == 1
+    assert quests.rewind_later_main_quests(
+        sf, _quest("Quest_CooksAssistant")) == []
 
 
 def test_uncomplete_blockers_ignore_non_completed_and_non_main():

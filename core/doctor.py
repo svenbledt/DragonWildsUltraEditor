@@ -81,6 +81,35 @@ def _fix_mounts(sf):
     return removed
 
 
+def _quest_entries(sf):
+    qp = sf.progress.get("QuestProgress")
+    entries = qp.get("Quests") if isinstance(qp, dict) else None
+    return entries if isinstance(entries, list) else []
+
+
+def _null_objective_entries(sf):
+    # QuestObjective is an FName string; 'no objective' is "None". A JSON
+    # null (written by older editor versions) makes the game drop the
+    # entry / corrupt the quest log on load.
+    return [e for e in _quest_entries(sf)
+            if isinstance(e, dict) and "QuestObjective" in e
+            and not isinstance(e["QuestObjective"], str)]
+
+
+def _scan_quest_objectives(sf):
+    bad = _null_objective_entries(sf)
+    return ["Quests: {} entr{} with a null objective, e.g. QuestId {}".format(
+        len(bad), "ies" if len(bad) != 1 else "y",
+        bad[0].get("QuestId"))] if bad else []
+
+
+def _fix_quest_objectives(sf):
+    bad = _null_objective_entries(sf)
+    for e in bad:
+        e["QuestObjective"] = "None"
+    return len(bad)
+
+
 def _scan_duplicates(sf):
     findings = []
     lists = [(k, _progress_list(sf, k)) for k in _DEDUP_LISTS]
@@ -123,6 +152,12 @@ CHECKS = [
      "explain": "MountsUnlockedList accepts only the game's known "
                 "MountDataAsset: refs — anything else corrupts the save.",
      "scan": _scan_mounts, "fix": _fix_mounts},
+    {"key": "quest_objectives",
+     "title": "Null quest objectives",
+     "explain": "QuestObjective must be a string (\"None\" when empty). A "
+                "JSON null — written by older editor versions — makes the "
+                "game drop the quest entry or roll the save back on load.",
+     "scan": _scan_quest_objectives, "fix": _fix_quest_objectives},
     {"key": "duplicates",
      "title": "Duplicate unlock entries",
      "explain": "The same id listed more than once in an unlock list.",

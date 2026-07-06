@@ -93,3 +93,24 @@ def test_fix_all_repairs_everything_in_one_pass():
     assert doctor.fix_all(sf) == 3
     assert doctor.scan(sf) == []
     assert sf.progress["Progress"]["ItemsPickedUp"] == ["good"]
+
+
+def test_null_quest_objectives_detected_and_repaired():
+    sf = _sf()
+    sf.progress["QuestProgress"] = {"Quests": [
+        {"QuestId": "a", "QuestState": 2, "QuestObjective": None,
+         "QuestInts": [], "QuestBools": []},
+        {"QuestId": "b", "QuestState": 1, "QuestObjective": "Objective1",
+         "QuestInts": [], "QuestBools": []},
+        {"QuestId": "c", "QuestState": 0, "QuestObjective": "None",
+         "QuestInts": [], "QuestBools": []},
+    ]}
+    report = doctor.scan(sf)
+    assert [r["key"] for r in report] == ["quest_objectives"]
+    assert doctor.fix(sf, "quest_objectives") == 1
+    entries = sf.progress["QuestProgress"]["Quests"]
+    # repaired to the FName string the game itself writes, others untouched
+    assert entries[0]["QuestObjective"] == "None"
+    assert entries[1]["QuestObjective"] == "Objective1"
+    assert sf.dirty is True
+    assert doctor.scan(sf) == []

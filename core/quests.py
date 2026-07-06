@@ -3,14 +3,19 @@
 Save layout (verified against real saves + game files):
 Quests[] entries: {QuestId, QuestState, QuestObjective, QuestInts, QuestBools}.
 QuestState is EQuestState: 0=Ungiven, 1=Given, 2=Complete. A quest with no
-entry is simply not started. New entries created here mirror the game's own
-fresh entries (objective None, empty variable lists).
+entry is simply not started. QuestObjective is an FName serialized as a
+string — no-objective is the string "None", NEVER JSON null: the game's
+JSON importer chokes on null and drops/corrupts the quest entries on load.
+New entries created here mirror the game's own fresh entries (objective
+"None", empty variable lists).
 
 Rewards are granted the way the quest-flow blueprints do: items into free
 Bag slots (Storage as overflow), recipe unlocks merged into RecipesUnlocked
 (all reward recipe ids are verified strict-mode-safe), mounts merged into
 MountsUnlockedList as bare MountDataAsset: refs.
 """
+import re
+
 from core import inventory as inv
 from core.unlocks import merge_ids
 from data.quest_data import EMBEDDED_QUESTS
@@ -27,6 +32,9 @@ STATE_LABELS = {
 # flips to Complete (2) at the turn-in conversation, so this leaves the
 # turn-in — and the game's own reward grant — to the player.
 READY_LABEL = "Ready to turn in"
+
+# FName "None" — how the game serializes 'no current objective'
+NO_OBJECTIVE = "None"
 
 CATEGORY_LABELS = [
     ("main", "Main story"),
@@ -60,6 +68,43 @@ def pretty_asset(asset):
         if word:
             words.append(word)
     return " ".join(words) or asset
+
+
+# --- objective story order -------------------------------------------------
+# The dump preserves the quest asset's ObjectiveTexts map order — editor
+# insertion order, not play order (Black Knight's Fortress lists its shard
+# sub-steps after the ending). When every id in a quest is one numeric-
+# suffixed family (Base_4, Base_4_13, ...) the numbers encode the real
+# ladder: sub-steps nest under their parent, -1 is that level's intro step.
+# Verified three ways for DR_Main: a real completed save ends at _6, the
+# wiki walkthrough opens with Speak To Death (_-1), and every other numeric
+# quest is already in this order. Mixed text ids keep dump order.
+
+_OBJ_BASE = re.compile(r"^(.*?)(?:_?-?\d+)*$")
+_OBJ_NUM = re.compile(r"-?\d+")
+
+
+def _objective_sort_key(objective_id):
+    # alternate str/int tokens, so comparisons never mix types
+    key, pos = [], 0
+    for m in _OBJ_NUM.finditer(objective_id):
+        key.append(objective_id[pos:m.start()])
+        key.append(int(m.group()))
+        pos = m.end()
+    key.append(objective_id[pos:])
+    return key
+
+
+def _story_order(objectives):
+    if (len({_OBJ_BASE.match(o).group(1) for o in objectives}) != 1
+            or not all(o[-1:].isdigit() for o in objectives)):
+        return objectives
+    return sorted(objectives, key=_objective_sort_key)
+
+
+for _q in EMBEDDED_QUESTS:
+    if _q["objectives"]:
+        _q["objectives"] = _story_order(_q["objectives"])
 
 
 # Main-story progression in expansion order: Bramblemead -> Fellhollow ->
@@ -110,6 +155,26 @@ def main_story_uncomplete_blockers(sf, quest):
     return blockers
 
 
+def rewind_later_main_quests(sf, quest):
+    """When `quest` becomes the active main-story point, later main
+    quests that are In progress (or merely have a stale entry) can't
+    legitimately coexist — remove their entries so only one main quest
+    is running. Later Completed quests are left alone (the uncomplete
+    blockers handle those). Returns the names of the quests reset."""
+    if quest["asset"] not in MAIN_QUEST_ORDER:
+        return []
+    states = get_states(sf)
+    reset = []
+    for asset in MAIN_QUEST_ORDER[MAIN_QUEST_ORDER.index(quest["asset"])
+                                  + 1:]:
+        later = next(q for q in EMBEDDED_QUESTS if q["asset"] == asset)
+        if (later["quest_id"] in states
+                and states[later["quest_id"]] != STATE_COMPLETED):
+            reset_quest(sf, later["quest_id"])
+            reset.append(later["name"])
+    return reset
+
+
 def quest_by_id(quest_id):
     for q in EMBEDDED_QUESTS:
         if q["quest_id"] == quest_id:
@@ -143,11 +208,13 @@ def get_states(sf):
 
 
 def get_objectives(sf):
-    """{quest_id: QuestObjective} for every quest entry in the save."""
+    """{quest_id: QuestObjective} for every quest entry in the save.
+    The game's no-objective marker "None" is read back as None."""
     objectives = {}
     for e in _quest_entries(sf):
         if isinstance(e, dict) and isinstance(e.get("QuestId"), str):
-            objectives[e["QuestId"]] = e.get("QuestObjective")
+            obj = e.get("QuestObjective")
+            objectives[e["QuestId"]] = None if obj == NO_OBJECTIVE else obj
     return objectives
 
 
@@ -183,13 +250,15 @@ def set_state(sf, quest_id, state, objective=_KEEP):
         if isinstance(e, dict) and e.get("QuestId") == quest_id:
             e["QuestState"] = state
             if objective is not _KEEP:
-                e["QuestObjective"] = objective
+                e["QuestObjective"] = (NO_OBJECTIVE if objective is None
+                                       else objective)
             break
     else:
         entries.append({
             "QuestId": quest_id,
             "QuestState": state,
-            "QuestObjective": None if objective is _KEEP else objective,
+            "QuestObjective": (NO_OBJECTIVE if objective in (_KEEP, None)
+                               else objective),
             "QuestInts": [],
             "QuestBools": [],
         })
