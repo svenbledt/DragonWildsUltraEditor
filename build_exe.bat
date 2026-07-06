@@ -138,12 +138,24 @@ if not exist "%BUILDDIR%\main.dist\%APPNAME%.exe" (
 )
 
 REM --- 6. Package the folder into a distributable zip ---------
+REM  Rename + zip + verify entirely inside %BUILDDIR%: cloud-sync
+REM  clients (Google Drive) start hashing files the moment they land
+REM  in the project tree, and Compress-Archive then dies on their
+REM  locks. Only two atomic same-volume moves touch dist\ at the end.
+REM  Compress-Archive failures are non-terminating (powershell.exe
+REM  still exits 0 and a truncated zip gets reported as BUILD
+REM  COMPLETE), so it runs with -ErrorAction Stop in a try/catch and
+REM  the zip's file count is checked against the folder afterwards.
 echo [6/6] Packaging dist\%APPNAME%-standalone.zip ...
 if not exist "dist" mkdir "dist"
-move "%BUILDDIR%\main.dist" "dist\%APPNAME%" >nul
-if errorlevel 1 ( echo [ERROR] Could not move the build folder into dist. & goto :fail )
-powershell -NoProfile -Command "Compress-Archive -Path 'dist\%APPNAME%' -DestinationPath 'dist\%APPNAME%-standalone.zip' -CompressionLevel Optimal"
-if errorlevel 1 ( echo [ERROR] Zipping the standalone folder failed. & goto :fail )
+ren "%BUILDDIR%\main.dist" "%APPNAME%"
+if errorlevel 1 ( echo [ERROR] Could not rename the build folder. & goto :fail )
+powershell -NoProfile -Command "try { Compress-Archive -Path '%BUILDDIR%\%APPNAME%' -DestinationPath '%BUILDDIR%\%APPNAME%-standalone.zip' -CompressionLevel Optimal -Force -ErrorAction Stop } catch { Write-Error $_; exit 1 }; Add-Type -AssemblyName System.IO.Compression.FileSystem; $zip = [IO.Compression.ZipFile]::OpenRead('%BUILDDIR%\%APPNAME%-standalone.zip'); $n = @($zip.Entries | Where-Object { $_.Name }).Count; $zip.Dispose(); $files = @(Get-ChildItem -LiteralPath '%BUILDDIR%\%APPNAME%' -Recurse -File).Count; if ($n -ne $files) { Write-Error ('zip holds {0} files but the folder has {1}' -f $n, $files); exit 1 }"
+if errorlevel 1 ( echo [ERROR] Zipping the standalone folder failed - nothing was placed in dist. & goto :fail )
+move "%BUILDDIR%\%APPNAME%-standalone.zip" "dist\%APPNAME%-standalone.zip" >nul
+if errorlevel 1 ( echo [ERROR] Could not move the zip into dist. & goto :fail )
+move "%BUILDDIR%\%APPNAME%" "dist\%APPNAME%" >nul
+if errorlevel 1 ( echo [ERROR] Could not move the app folder into dist. & goto :fail )
 if exist "%BUILDDIR%" rmdir /s /q "%BUILDDIR%"
 
 echo(
