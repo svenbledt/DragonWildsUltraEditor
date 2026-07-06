@@ -22,6 +22,7 @@ PAGES = [
     ("storage", "Storage", "ui.pages.storage", "StoragePage"),
     ("quests", "Quests", "ui.pages.quests", "QuestsPage"),
     ("unlocks", "Unlocks", "ui.pages.unlocks", "UnlocksPage"),
+    ("doctor", "Save doctor", "ui.pages.doctor", "DoctorPage"),
 ]
 
 ABOUT_TEXT = (
