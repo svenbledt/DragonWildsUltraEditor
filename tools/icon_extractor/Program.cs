@@ -30,6 +30,24 @@ class Program
 {
     static int Main(string[] args)
     {
+        // --find <substring>: list every package path containing the substring
+        // (case-insensitive) and exit. Handy for verifying what actually exists
+        // in the paks (e.g. all DA_Mount_* assets) without an in-game dump.
+        if (args.Length >= 2 && args[0] == "--find")
+        {
+            var findProvider = new DefaultFileProvider(
+                @"F:\SteamLibrary\steamapps\common\RSDragonwilds\RSDragonwilds\Content\Paks",
+                SearchOption.AllDirectories, new VersionContainer(EGame.GAME_UE5_6));
+            findProvider.Initialize();
+            findProvider.SubmitKey(new FGuid(), new FAesKey("0x0000000000000000000000000000000000000000000000000000000000000000"));
+            var needle = args[1].ToLowerInvariant();
+            int n = 0;
+            foreach (var f in findProvider.Files.Keys.OrderBy(k => k))
+                if (f.ToLowerInvariant().Contains(needle)) { Console.WriteLine(f); n++; }
+            Console.WriteLine($"[find] {n} matches");
+            return 0;
+        }
+
         // args: [paksDir] [usmapPath] [iconlistPath] [outDir] [onlyStem] [mode] [itemsJsonlPath]
         string paks   = args.Length > 0 && !string.IsNullOrEmpty(args[0]) ? args[0] : @"F:\SteamLibrary\steamapps\common\RSDragonwilds\RSDragonwilds\Content\Paks";
         string usmap  = args.Length > 1 && !string.IsNullOrEmpty(args[1]) ? args[1] : @"F:\SteamLibrary\steamapps\common\RSDragonwilds\RSDragonwilds\Binaries\Win64\ue4ss\Mappings.usmap";

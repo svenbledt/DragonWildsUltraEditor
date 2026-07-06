@@ -1795,6 +1795,8 @@ EMBEDDED_BUILDING_IDS = ['-0eo6kylMjPlZX6jXKSx7w',
 
 EMBEDDED_MOUNT_TAGS = ['MountDataAsset:DA_Mount_FlyingCarpet_01_01',
  'MountDataAsset:DA_Mount_FlyingCarpet_01_02',
+ 'MountDataAsset:DA_Mount_FlyingCarpet_01_03',
+ 'MountDataAsset:DA_Mount_FlyingCarpet_01_04',
  'MountDataAsset:DA_Mount_FlyingCarpet_01_05',
  'MountDataAsset:DA_Mount_Terrorbird_00_00',
  'MountDataAsset:DA_Mount_Terrorbird_01_01',
