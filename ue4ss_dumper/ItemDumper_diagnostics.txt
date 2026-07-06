@@ -12,7 +12,7 @@ class chain:
   DominionDataAsset
   DataAsset
   Object
-sample record: {"PersistenceID":"q_AyO0EBaOKF0su-tl7Gsg","MaxStackSize":1,"__class":"HeldEquipmentData","PowerLevel":5,"Weight":15,"Name":"Steel Sword","__fullname":"HeldEquipmentData /Game/Gameplay/Character/Player/Equipment/Held/Sword/ITEM_Sword_Steel.ITEM_Sword_Steel"}
+sample record: {"__fullname":"HeldEquipmentData /Game/Gameplay/Character/Player/Equipment/Held/Sword/ITEM_Sword_Steel.ITEM_Sword_Steel","MaxStackSize":1,"__class":"HeldEquipmentData","PersistenceID":"q_AyO0EBaOKF0su-tl7Gsg","Weight":15,"Name":"Steel Sword","PowerLevel":5}
 target classes: HeldEquipmentData, EquipmentData, ItemData
 phase: FindAllOf('HeldEquipmentData')
   count: 201
@@ -65,3 +65,16 @@ mount DONE: 36 records -> ItemDumper_mounts.jsonl
   FindAllOf(Buildable) = 0
   FindAllOf(Building) = 0
 building DONE: 772 records -> ItemDumper_buildings.jsonl
+=== urn/shrine dump (class-name scan, crash-safe) ===
+  FindAllOf(SanguineUrnData) = 0
+  FindAllOf(ShrineData) = 0
+  FindAllOf(HealthShrineData) = 0
+  FindAllOf(LifePoolShrineData) = 0
+  FindAllOf(LifeShrineData) = 0
+  FindAllOf(ShrineDataAsset) = 0
+  FindAllOf(InteractableShrineData) = 0
+  FindAllOf(SanguineUrn) = 0
+  FindAllOf(HealthUpgradeData) = 0
+  FindAllOf(MaxHealthShrineData) = 0
+  FindAllOf(VitalityShrineData) = 0
+urn DONE: 0 records -> ItemDumper_urns.jsonl
