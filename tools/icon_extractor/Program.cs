@@ -48,6 +48,24 @@ class Program
             return 0;
         }
 
+        // --dump-data [outDir]: static game-data dump (items/recipes/buildings/
+        // mounts) straight from the paks — replaces the UE4SS ItemDumper mod.
+        if (args.Length >= 1 && args[0] == "--dump-data")
+            return DataDump.Run(args);
+
+        // --cat <pakPath>: print a raw (non-uasset) pak file, e.g. a Config ini.
+        if (args.Length >= 2 && args[0] == "--cat")
+        {
+            var catProvider = new DefaultFileProvider(
+                @"F:\SteamLibrary\steamapps\common\RSDragonwilds\RSDragonwilds\Content\Paks",
+                SearchOption.AllDirectories, new VersionContainer(EGame.GAME_UE5_6));
+            catProvider.Initialize();
+            catProvider.SubmitKey(new FGuid(), new FAesKey("0x0000000000000000000000000000000000000000000000000000000000000000"));
+            var data = catProvider.SaveAsset(args[1]);
+            Console.WriteLine(System.Text.Encoding.UTF8.GetString(data));
+            return 0;
+        }
+
         // --quests [raw <name> | rawpkg <substr> | enums]: quest definition dump
         // (see QuestDiscovery.cs). Writes quests_dump.json in the project dir.
         if (args.Length >= 1 && args[0] == "--quests")
@@ -61,7 +79,7 @@ class Program
         string only   = args.Length > 4 && !string.IsNullOrEmpty(args[4]) ? args[4].ToLowerInvariant() : null;
         string mode   = args.Length > 5 && !string.IsNullOrEmpty(args[5]) ? args[5].ToLowerInvariant() : "static";
         string itemsJsonl = args.Length > 6 && !string.IsNullOrEmpty(args[6]) ? args[6]
-            : Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "ue4ss_dumper", "ItemDumper_items.jsonl");
+            : Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "game_dump", "ItemDumper_items.jsonl");
 
         Console.WriteLine($"[cfg] paks={paks}");
         Console.WriteLine($"[cfg] usmap={usmap}");

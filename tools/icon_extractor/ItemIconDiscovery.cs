@@ -18,7 +18,7 @@ using CUE4Parse.UE4.Objects.UObject;
 //     is always "<Root>/Content/<same-relative-path-as-the-/Root/-alias>.uasset"
 //     regardless of which root it is - so a root-agnostic reverse lookup
 //     (relative path after "/content/", case-insensitive) resolves all of them.
-//   * The exact per-item relative path comes from tools/ue4ss_dumper's
+//   * The exact per-item relative path comes from tools/game_dump's
 //     ItemDumper_items.jsonl (`__fullname`, e.g. "ItemData /Game/Foo/Bar.Bar"),
 //     already produced by an earlier in-game F8 dump for every item in
 //     data/item_ids.py - it just wasn't previously used for icon lookup.
@@ -78,7 +78,7 @@ static class ItemIconDiscovery
         return contentIndex.TryGetValue(rel, out var full) ? full : null;
     }
 
-    // itemsJsonlPath: tools/ue4ss_dumper/ItemDumper_items.jsonl - one JSON object
+    // itemsJsonlPath: tools/game_dump/ItemDumper_items.jsonl - one JSON object
     // per line with at least "PersistenceID" and "__fullname".
     public static Result Discover(DefaultFileProvider provider, string itemsJsonlPath, string outDir)
     {

@@ -26,7 +26,7 @@ How it works (verified 2026-07-06 against RSDragonwilds / `GAME_UE5_6`):
   path *after* `.../Content/` (case-insensitive) resolves all of them
   uniformly (`ItemIconDiscovery.BuildContentPathIndex` /
   `ResolvePackagePath`).
-* The per-item relative path comes from `tools/ue4ss_dumper/ItemDumper_items.jsonl`'s
+* The per-item relative path comes from `tools/game_dump/ItemDumper_items.jsonl`'s
   `__fullname` field (`"ItemData /Game/Foo/Bar.Bar"`), produced by an earlier
   in-game F8 dump for essentially every item in `data/item_ids.py` - that
   file just was never previously used for icon lookup.
@@ -77,10 +77,12 @@ dropped, even if a later run can't re-derive them (e.g. paks unavailable).
 ## Prerequisites
 
 1. **.NET 10 SDK** (CUE4Parse `1.2.2.202607` targets `net10.0`).
-2. A **`Mappings.usmap`** for the game (F9 / `dump_usmap` in-game via the
-   ItemDumper UE4SS mod - see `tools/ue4ss_dumper/README.md`).
-3. `tools/ue4ss_dumper/ItemDumper_items.jsonl` present (already checked into
-   the repo; regenerate via the F8 in-game dump after a game update).
+2. A **`Mappings.usmap`** for the game (generated once by UE4SS's usmap
+   dumper into `<game>/Binaries/Win64/ue4ss/Mappings.usmap`; only needs
+   regenerating when the game updates its engine/reflection data).
+3. `tools/game_dump/ItemDumper_items.jsonl` present (already checked into
+   the repo; regenerate with `dotnet run -- --dump-data` here after a game
+   update - see `tools/game_dump/README.md`).
 
 ## Run
 
@@ -91,7 +93,7 @@ dotnet run -c Release
 Args (all optional, positional): `[paksDir] [usmapPath] [iconlistPath]
 [outDir] [onlyStem] [mode] [itemsJsonlPath]`. Defaults point at the local
 Steam install, `tools/icon_extractor/iconlist.txt`, `data/icons/`, `static`
-mode, and `tools/ue4ss_dumper/ItemDumper_items.jsonl`, respectively. Pass
+mode, and `tools/game_dump/ItemDumper_items.jsonl`, respectively. Pass
 `mode=iconlist` to run only the legacy stem-match pass (e.g. for a quick
 top-up without remounting for a static re-scan of every item).
 

@@ -198,7 +198,7 @@ static class QuestDiscovery
     static Dictionary<string, Dictionary<string, string>> _stringTableCache =
         new Dictionary<string, Dictionary<string, string>>(StringComparer.OrdinalIgnoreCase);
 
-    static string TextOf(DefaultFileProvider provider, Dictionary<string, string> contentIndex,
+    internal static string TextOf(DefaultFileProvider provider, Dictionary<string, string> contentIndex,
         CUE4Parse.UE4.Objects.Core.i18N.FText t)
     {
         if (t == null) return null;
@@ -241,10 +241,10 @@ static class QuestDiscovery
     {
         var questPkgs = FindQuestPackages(provider);
 
-        // Item asset-name -> persistence id, from the in-game dump (covers
+        // Item asset-name -> persistence id, from the static game dump (covers
         // BP_Consumables_* classes whose cooked asset has no PersistenceID tag).
         var namePid = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        var itemsJsonl = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "ue4ss_dumper", "ItemDumper_items.jsonl");
+        var itemsJsonl = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "game_dump", "ItemDumper_items.jsonl");
         if (File.Exists(itemsJsonl))
         {
             foreach (var line in File.ReadLines(itemsJsonl))
