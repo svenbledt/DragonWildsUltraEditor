@@ -40,7 +40,17 @@ class StoragePage(ctk.CTkFrame):
         id_to_name, _, _, _ = inv.item_maps()
         lo, hi = inv.STORAGE_RANGE
         self.grid_widget.render(lo, hi, inv.slots(sf, "storage"),
-                                id_to_name, self._on_slot)
+                                id_to_name, self._on_slot,
+                                on_hover=self._on_hover)
+
+    def _on_hover(self, slot, name):
+        if slot is None:
+            self.app.set_status("")
+        elif name:
+            self.app.set_status("Slot {}: {}".format(slot, name))
+        else:
+            self.app.set_status("Slot {}: empty — click to add an item"
+                                .format(slot))
 
     def _on_slot(self, slot):
         sf = self.app.save

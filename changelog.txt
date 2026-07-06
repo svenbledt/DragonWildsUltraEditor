@@ -16,3 +16,4 @@ Changelog
 9. Restored the full About content: app icon, description, and the credits — originally created by TatsumaYakoshi, continued & maintained by TailwindDev, with a shout out to Elleandria.
 10. Extended item-icon coverage from 754 to 1,384 of 1,385 items — icons are now read directly from the game files, so every real item shows its proper icon.
 11. Mount unlocker now covers all 21 mounts (5 Flying Carpets + 16 Terrorbirds, verified against the game files) — two carpet variants were previously missing.
+12. Inventory & Storage grids restyled to match the in-game look: icons fill the slots, stack counts overlay the corner, the Bag shows its numbered hotbar row (slots 1-8) separately, and hovering a slot shows the item name in the status bar.

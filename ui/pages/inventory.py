@@ -53,11 +53,23 @@ class InventoryPage(ctk.CTkFrame):
             entries = inv.slots(sf, "loadout")
             hi = max(entries) if entries else 11
             self.grid_widget.render(0, max(hi, 11), entries, id_to_name,
-                                    self._on_slot)
+                                    self._on_slot, on_hover=self._on_hover)
         else:
             lo, hi = inv.slot_bounds("inventory", self.tab)
+            # in-game, the first 8 bag slots are the hotbar
             self.grid_widget.render(lo, hi, inv.slots(sf, "inventory"),
-                                    id_to_name, self._on_slot)
+                                    id_to_name, self._on_slot,
+                                    hotbar=8 if self.tab == "Bag" else 0,
+                                    on_hover=self._on_hover)
+
+    def _on_hover(self, slot, name):
+        if slot is None:
+            self.app.set_status("")
+        elif name:
+            self.app.set_status("Slot {}: {}".format(slot, name))
+        else:
+            self.app.set_status("Slot {}: empty — click to add an item"
+                                .format(slot))
 
     def _container(self):
         return "loadout" if self.tab == "Loadout" else "inventory"
