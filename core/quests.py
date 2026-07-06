@@ -23,6 +23,10 @@ STATE_LABELS = {
     STATE_IN_PROGRESS: "In progress",
     STATE_COMPLETED: "Completed",
 }
+# Virtual state: Given (1) at the quest's final objective. The game only
+# flips to Complete (2) at the turn-in conversation, so this leaves the
+# turn-in — and the game's own reward grant — to the player.
+READY_LABEL = "Ready to turn in"
 
 CATEGORY_LABELS = [
     ("main", "Main story"),
@@ -97,24 +101,59 @@ def get_states(sf):
     return states
 
 
-def set_state(sf, quest_id, state):
-    """Set a quest's state, creating its save entry if needed."""
+def get_objectives(sf):
+    """{quest_id: QuestObjective} for every quest entry in the save."""
+    objectives = {}
+    for e in _quest_entries(sf):
+        if isinstance(e, dict) and isinstance(e.get("QuestId"), str):
+            objectives[e["QuestId"]] = e.get("QuestObjective")
+    return objectives
+
+
+def final_objective(quest):
+    return quest["objectives"][-1] if quest["objectives"] else None
+
+
+def display_state(quest, state, objective):
+    """Label for the UI, folding in the virtual ready-to-turn-in state."""
+    if (state == STATE_IN_PROGRESS and quest["objectives"]
+            and objective == final_objective(quest)):
+        return READY_LABEL
+    return STATE_LABELS[state]
+
+
+_KEEP = object()
+
+
+def set_state(sf, quest_id, state, objective=_KEEP):
+    """Set a quest's state, creating its save entry if needed. Existing
+    quest variables and objective are preserved unless `objective` is
+    passed explicitly."""
     if state not in STATE_LABELS:
         raise ValueError("Unknown quest state: {}".format(state))
     entries = _quest_entries(sf, create=True)
     for e in entries:
         if isinstance(e, dict) and e.get("QuestId") == quest_id:
             e["QuestState"] = state
+            if objective is not _KEEP:
+                e["QuestObjective"] = objective
             break
     else:
         entries.append({
             "QuestId": quest_id,
             "QuestState": state,
-            "QuestObjective": None,
+            "QuestObjective": None if objective is _KEEP else objective,
             "QuestInts": [],
             "QuestBools": [],
         })
     sf.mark_dirty()
+
+
+def set_ready_to_turn_in(sf, quest):
+    """Put a quest In progress at its final objective, so the player can
+    turn it in at the NPC and receive the rewards from the game itself."""
+    set_state(sf, quest["quest_id"], STATE_IN_PROGRESS,
+              objective=final_objective(quest))
 
 
 def complete_all(sf, category):
@@ -128,18 +167,11 @@ def complete_all(sf, category):
     return changed
 
 
-def _free_slots(sf):
-    """Free Bag slots first, then free Storage slots, in order."""
+def _free_bag_slots(sf):
+    """Free Bag slot numbers, in order."""
     lo, hi = inv.slot_bounds("inventory", "Bag")
     used = inv.slots(sf, "inventory")
-    for slot in range(lo, hi + 1):
-        if slot not in used:
-            yield "inventory", slot
-    lo, hi = inv.STORAGE_RANGE
-    used = inv.slots(sf, "storage")
-    for slot in range(lo, hi + 1):
-        if slot not in used:
-            yield "storage", slot
+    return [slot for slot in range(lo, hi + 1) if slot not in used]
 
 
 def _unlock_reward_mount(sf, asset):
@@ -173,14 +205,23 @@ def _unlock_reward_recipe(sf, recipe_id):
 
 
 def grant_rewards(sf, quest):
-    """Give a quest's rewards to the character.
+    """Give a quest's rewards to the character. Reward items go into free
+    Bag slots only — all or nothing: if the bag can't hold every item,
+    NOTHING is granted and the caller is told to free up space first.
 
     Returns (granted, skipped): human-readable lists of what was added and
-    what could not be (already owned unlocks, no free slots).
+    what could not be (already owned unlocks, not enough bag space).
     """
     id_to_name, _, _, _ = inv.item_maps()
     granted, skipped = [], []
-    free = _free_slots(sf)
+    free = _free_bag_slots(sf)
+    needed = sum(1 for r in quest["rewards"]
+                 if r["type"] == "item" and r["item_id"])
+    if needed > len(free):
+        return [], ["Not enough inventory space — this quest needs {} free "
+                    "Bag slot{} (you have {}). Free up space first.".format(
+                        needed, "s" if needed != 1 else "", len(free))]
+    free = iter(free)
     for r in quest["rewards"]:
         label = id_to_name.get(r["item_id"]) if r["item_id"] else None
         label = label or pretty_asset(r["asset"])
@@ -188,12 +229,8 @@ def grant_rewards(sf, quest):
             if not r["item_id"]:
                 skipped.append(label)
                 continue
-            try:
-                where, slot = next(free)
-            except StopIteration:
-                skipped.append("{} (no free slot)".format(label))
-                continue
-            inv.set_slot(sf, where, slot, r["item_id"], r["count"])
+            inv.set_slot(sf, "inventory", next(free), r["item_id"],
+                         r["count"])
             granted.append("{}{}".format(
                 label, " x{}".format(r["count"]) if r["count"] > 1 else ""))
         elif r["type"] == "recipe_unlock":

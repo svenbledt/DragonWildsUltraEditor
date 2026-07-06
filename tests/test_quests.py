@@ -133,15 +133,49 @@ def test_grant_mount_reward_writes_bare_dataasset_ref():
     assert unlocked.count(ref) == 1
 
 
-def test_grant_items_overflows_to_storage_and_reports_full():
+def test_grant_is_all_or_nothing_when_bag_is_short():
     sf = _sf()
+    # leave only 2 free Bag slots; Quest_FTUE_Q2 has 3 item rewards
     lo, hi = inv.slot_bounds("inventory", "Bag")
-    for s in range(lo, hi + 1):
+    for s in range(lo, hi - 1):
         inv.set_slot(sf, "inventory", s, "lCE7i3iXGUuHv7FphIOcXg", 1)
-    slo, shi = inv.STORAGE_RANGE
-    for s in range(slo, shi + 1):
-        inv.set_slot(sf, "storage", s, "lCE7i3iXGUuHv7FphIOcXg", 1)
+    before = dict(inv.slots(sf, "inventory"))
     q = _quest("Quest_FTUE_Q2")
     granted, skipped = quests.grant_rewards(sf, q)
     assert not granted
-    assert len(skipped) == 3 and all("no free slot" in s for s in skipped)
+    assert len(skipped) == 1
+    assert "3 free Bag slots" in skipped[0] and "you have 2" in skipped[0]
+    # nothing was placed anywhere — not even partially
+    assert dict(inv.slots(sf, "inventory")) == before
+    assert not inv.slots(sf, "storage")
+
+
+# ---- ready to turn in ----------------------------------------------------
+
+def test_set_ready_to_turn_in_uses_final_objective():
+    sf = _sf()
+    q = _quest("Quest_CooksAssistant")
+    quests.set_ready_to_turn_in(sf, q)
+    entry = sf.progress["QuestProgress"]["Quests"][0]
+    assert entry["QuestState"] == quests.STATE_IN_PROGRESS
+    assert entry["QuestObjective"] == q["objectives"][-1] == "Objective5"
+    assert quests.display_state(
+        q, entry["QuestState"], entry["QuestObjective"]) == quests.READY_LABEL
+
+
+def test_display_state_distinguishes_ready_from_in_progress():
+    q = _quest("Quest_CooksAssistant")
+    assert quests.display_state(q, 1, "Objective1") == "In progress"
+    assert quests.display_state(q, 1, None) == "In progress"
+    assert quests.display_state(q, 2, "Objective5") == "Completed"
+    assert quests.display_state(q, 0, None) == "Not started"
+
+
+def test_ready_on_objectiveless_quest_is_plain_in_progress():
+    sf = _sf()
+    q = _quest("Quest_Whip")   # hidden quest with no objectives
+    quests.set_ready_to_turn_in(sf, q)
+    entry = sf.progress["QuestProgress"]["Quests"][0]
+    assert entry["QuestState"] == quests.STATE_IN_PROGRESS
+    assert entry["QuestObjective"] is None
+    assert quests.display_state(q, 1, None) == "In progress"

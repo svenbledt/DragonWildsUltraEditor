@@ -10,10 +10,12 @@ from ui.icons import get_icon
 
 TABS = list(quests.CATEGORY_LABELS)
 _STATE_COLORS = {
-    quests.STATE_NOT_STARTED: ("gray40", "gray60"),
-    quests.STATE_IN_PROGRESS: ("#a07020", "#e0b060"),
-    quests.STATE_COMPLETED: ("#3a7a3a", "#7ac07a"),
+    quests.STATE_LABELS[quests.STATE_NOT_STARTED]: ("gray40", "gray60"),
+    quests.STATE_LABELS[quests.STATE_IN_PROGRESS]: ("#a07020", "#e0b060"),
+    quests.READY_LABEL: ("#2060a0", "#70a8e0"),
+    quests.STATE_LABELS[quests.STATE_COMPLETED]: ("#3a7a3a", "#7ac07a"),
 }
+_STATE_CHOICES = list(_STATE_COLORS)
 
 
 class QuestsPage(ctk.CTkFrame):
@@ -44,14 +46,16 @@ class QuestsPage(ctk.CTkFrame):
         if sf is None:
             return
         states = quests.get_states(sf)
+        objectives = quests.get_objectives(sf)
         rows = quests.quests(self.category)
         done = sum(1 for q in rows
                    if states.get(q["quest_id"]) == quests.STATE_COMPLETED)
         self.counter.configure(
             text="{} / {} completed".format(done, len(rows)))
         for q in rows:
-            self._card(q, states.get(q["quest_id"],
-                                     quests.STATE_NOT_STARTED))
+            state = states.get(q["quest_id"], quests.STATE_NOT_STARTED)
+            self._card(q, quests.display_state(
+                q, state, objectives.get(q["quest_id"])))
 
     def _card(self, q, state):
         card = ctk.CTkFrame(self.list_frame, corner_radius=10)
@@ -64,8 +68,7 @@ class QuestsPage(ctk.CTkFrame):
         ctk.CTkLabel(head, text=q["name"], anchor="w",
                      font=ctk.CTkFont(size=14, weight="bold")
                      ).pack(side="left")
-        ctk.CTkLabel(head, text=quests.STATE_LABELS[state],
-                     font=ctk.CTkFont(size=12),
+        ctk.CTkLabel(head, text=state, font=ctk.CTkFont(size=12),
                      text_color=_STATE_COLORS[state]).pack(side="left",
                                                            padx=10)
         if q["description"]:
@@ -89,13 +92,11 @@ class QuestsPage(ctk.CTkFrame):
                           text_color=("gray20", "gray80"),
                           command=lambda: self._give_rewards(q)
                           ).pack(pady=(0, 6))
-        var = ctk.StringVar(value=quests.STATE_LABELS[state])
+        var = ctk.StringVar(value=state)
         ctk.CTkOptionMenu(
-            actions, variable=var, width=130,
-            values=[quests.STATE_LABELS[s] for s in sorted(
-                quests.STATE_LABELS)],
-            command=lambda label, qid=q["quest_id"]: self._set_state(
-                qid, label)).pack()
+            actions, variable=var, width=140, values=_STATE_CHOICES,
+            command=lambda label, quest=q: self._set_state(
+                quest, label)).pack()
 
     def _rewards_line(self, parent, q):
         line = ctk.CTkFrame(parent, fg_color="transparent")
@@ -124,12 +125,18 @@ class QuestsPage(ctk.CTkFrame):
                 self.category = key
         self.refresh()
 
-    def _set_state(self, quest_id, label):
-        state = {v: k for k, v in quests.STATE_LABELS.items()}[label]
-        quests.set_state(self.app.save, quest_id, state)
+    def _set_state(self, q, label):
+        if label == quests.READY_LABEL:
+            quests.set_ready_to_turn_in(self.app.save, q)
+            self.app.set_status(
+                "Quest set to its final objective — turn it in at the NPC "
+                "to receive the rewards in-game. Press Save to keep.")
+        else:
+            state = {v: k for k, v in quests.STATE_LABELS.items()}[label]
+            quests.set_state(self.app.save, q["quest_id"], state)
+            self.app.set_status(
+                "Quest set to {} — press Save to keep.".format(label))
         self.app.mark_dirty()
-        self.app.set_status("Quest set to {} — press Save to keep.".format(
-            label))
         self.refresh()
 
     def _give_rewards(self, q):
@@ -140,7 +147,8 @@ class QuestsPage(ctk.CTkFrame):
         if granted:
             parts.append("Granted: " + ", ".join(granted))
         if skipped:
-            parts.append("Skipped: " + ", ".join(skipped))
+            parts.append("Skipped: " + ", ".join(skipped)
+                         if granted else ", ".join(skipped))
         self.app.set_status(
             ("; ".join(parts) + " — press Save to keep.") if granted
             else ("; ".join(parts) or "This quest has no rewards."))
