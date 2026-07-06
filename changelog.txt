@@ -14,3 +14,4 @@ Changelog
 7. Redesigned the About screen (icon, description, credits) and made it open on first launch.
 8. Fixed the standalone exe showing "Coming soon..." on every page (the editor pages were missing from the compiled build).
 9. Restored the full About content: app icon, description, and the credits — originally created by TatsumaYakoshi, continued & maintained by TailwindDev, with a shout out to Elleandria.
+10. Extended item-icon coverage from 754 to 1,384 of 1,385 items — icons are now read directly from the game files, so every real item shows its proper icon.
