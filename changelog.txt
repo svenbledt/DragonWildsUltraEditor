@@ -1,0 +1,14 @@
+Changelog
+
+1. v13 redesign: new sidebar UI (CustomTkinter). Launch straight into a
+   character picker (newest save first, with name/mode/level/played-ago),
+   pick a save, and edit across six pages — Overview, Character, Skills,
+   Inventory, Storage, Unlocks — each with icons for every item. One Save
+   button writes the whole file at once and keeps timestamped .bak- backups
+   (5 kept), replacing the old tabbed live-JSON-preview editor.
+2. Updated to the Umbral Sands game version (items, recipes, buildings, mounts, and save layout refreshed).
+3. Added one-click unlockers for recipes, buildings, mounts, picked-up items, and all 18 Sanguine Urns.
+4. Added per-expansion loadout templates — apply a region/class best-in-slot gear & storage kit in one click.
+5. Added name-based search & filtering across all item lists.
+6. Packaged as a single Windows .exe (no Python needed) with a proper window/taskbar icon.
+7. Redesigned the About screen (icon, description, credits) and made it open on first launch.

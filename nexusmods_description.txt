@@ -1,0 +1,41 @@
+[size=5][b]Description[/b][/size]
+DragonWilds Ultra Editor is a standalone save editor for [i]RuneScape: Dragonwilds[/i]. Launch it and pick your character from a save browser, then freely edit your character, skills, inventory, storage and unlocks through a clean sidebar interface — with icons for every item so you can see exactly what you're editing. One Save button writes your changes and keeps automatic backups. It's a single Windows executable: no installer, no Python, no dependencies to set up.
+
+[size=5][b]Installation[/b][/size]
+[list=1]
+[*]Close RuneScape: Dragonwilds (saves are read/written on exit — the game must not be running).
+[*][b]Back up your save first.[/b] Your character saves live in:
+[code]C:\Users\<YourName>\AppData\Local\RSDragonwilds\Saved\SaveCharacters[/code]
+[*]Download and run [b]DragonWildsUltraEditor.exe[/b]. (Windows SmartScreen may warn on an unsigned exe — click "More info" → "Run anyway".)
+[*]Pick your character from the picker screen (lists your saves newest-first with name/mode/level).
+[*]Make your edits across the Overview, Character, Skills, Inventory, Storage, and Unlocks pages, then click [b]Save[/b].
+[*]Launch the game and enjoy.
+[/list]
+[i]Tip: try it on a COPY of a save the first time.[/i]
+
+[size=5][b]Main features[/b][/size]
+[list]
+[*][b]Character picker[/b] — jump straight to the save you want, sorted newest-first with name/mode/level/played-ago.
+[*][b]Full inventory & storage editing[/b] — add, remove, bulk-fill, filter, and set slots/amounts, with an icon for every item.
+[*][b]Gear & storage presets[/b] — apply ready-made loadouts in one click.
+[*][b]Editable loadout[/b] straight from the Inventory page.
+[*][b]Character & skills[/b] — change your name/GUID and edit skills.
+[*][b]Unlock everything[/b] — recipes, buildings, mounts, picked-up items, and all 18 Sanguine Urns (max life pool).
+[*][b]Reset[/b] Health, Status Effects, and more.
+[*][b]One Save button[/b] writes every page's changes at once and keeps timestamped backups next to your save.
+[*][b]Item icons[/b] throughout, name-based search/filter on all item lists, and Light & Dark themes.
+[/list]
+
+[size=5][b]Requirements[/b][/size]
+[list]
+[*]Windows 10/11.
+[*]A copy of RuneScape: Dragonwilds with at least one character save.
+[*]No additional software required — everything is bundled in the exe.
+[/list]
+
+[size=5][b]Shout outs[/b][/size]
+[list]
+[*][b]TatsumaYakoshi[/b] — creator of the original editor; this release continues that work.
+[*][b]Elleandria[/b] — for the help along the way.
+[*]And the RuneScape: Dragonwilds community.
+[/list]
