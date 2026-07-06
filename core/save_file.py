@@ -22,7 +22,11 @@ class SaveFile:
             with open(path, "r", encoding="utf-8") as f:
                 data = json.load(f)
         except (OSError, ValueError) as e:
-            raise SaveError("Could not read this file:\n{}".format(e))
+            raise SaveError(
+                "This file couldn't be opened or isn't readable JSON, "
+                "so it can't be loaded as a save.\n"
+                "(Technical detail: {})".format(e)
+            )
         if not isinstance(data, dict) or not (
             isinstance(data.get("GameProgress"), dict)
             or isinstance(data.get("Progress"), dict)
