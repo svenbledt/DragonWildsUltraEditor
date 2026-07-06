@@ -160,15 +160,15 @@ class QuestsPage(ctk.CTkFrame):
                     "Blocked: complete {} first (main story order)."
                     .format(", ".join(blockers)))
                 return
-        quests.set_objective(sf, q, objective_id)
+        notes = quests.set_objective(sf, q, objective_id)
         if objective_id == quests.final_objective(q):
             msg = ("Quest set to its final objective — turn it in at the "
                    "NPC to receive the rewards in-game.")
         else:
             msg = "Quest set to objective: {}.".format(
                 quests.objective_label(q, objective_id).rstrip("."))
-        self.app.set_status(msg + self._rewind_note(q)
-                            + " Press Save to keep.")
+        self.app.set_status(msg + self._sync_note(notes)
+                            + self._rewind_note(q) + " Press Save to keep.")
         self.app.mark_dirty()
         self.refresh()
 
@@ -179,6 +179,12 @@ class QuestsPage(ctk.CTkFrame):
         return (" Also reset the now-out-of-order main quest{}: {}.".format(
             "s" if len(names) != 1 else "", ", ".join(names))
             if names else "")
+
+    @staticmethod
+    def _sync_note(notes):
+        """Umbral Sands edits keep the camp favour, task quests and main
+        quest consistent with each other — tell the user what moved."""
+        return (" Synced: {}.".format("; ".join(notes)) if notes else "")
 
     def _rewards_line(self, parent, q):
         line = ctk.CTkFrame(parent, fg_color="transparent")
@@ -232,19 +238,22 @@ class QuestsPage(ctk.CTkFrame):
                         .format(", ".join(blockers)))
                     self.refresh()
                     return
+        notes = []
         if label == quests.READY_LABEL:
-            quests.set_ready_to_turn_in(sf, q)
+            notes = quests.set_ready_to_turn_in(sf, q)
             msg = ("Quest set to its final objective — turn it in at the "
                    "NPC to receive the rewards in-game.")
         elif label == quests.STATE_LABELS[quests.STATE_NOT_STARTED]:
             quests.reset_quest(sf, q["quest_id"])
             msg = "Quest reset to Not started."
         elif label == quests.STATE_LABELS[quests.STATE_IN_PROGRESS]:
-            quests.set_in_progress(sf, q)
+            notes = quests.set_in_progress(sf, q)
             msg = "Quest set to In progress."
         else:
-            quests.set_state(sf, q["quest_id"], quests.STATE_COMPLETED)
+            notes = quests.set_state(sf, q["quest_id"],
+                                     quests.STATE_COMPLETED)
             msg = "Quest set to Completed."
+        msg += self._sync_note(notes)
         if label != quests.STATE_LABELS[quests.STATE_COMPLETED]:
             msg += self._rewind_note(q)
         self.app.set_status(msg + " Press Save to keep.")
