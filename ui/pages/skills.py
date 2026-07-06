@@ -84,6 +84,7 @@ class SkillsPage(ctk.CTkFrame):
         self.app.mark_dirty()
         self.app.set_status(
             "Applied {} skills — press Save to keep.".format(applied))
+        self.refresh()
 
     def _max_all(self):
         skills.max_all_skills(self.app.save)

@@ -95,7 +95,8 @@ class SaveFile:
         to a temp file and atomically replace. Returns the backup path
         (None when the file didn't exist yet). Clears `dirty` on success."""
         if not self.path:
-            raise SaveError("No file path set.")
+            raise SaveError(
+                "This save has no file path yet, so it can't be written.")
         backup = None
         if os.path.exists(self.path):
             stamp = datetime.now().strftime("%Y%m%d-%H%M%S-%f")
@@ -108,9 +109,16 @@ class SaveFile:
                 dst.write(src.read())
             self._prune_backups()
         tmp = self.path + ".tmp"
-        with open(tmp, "w", encoding="utf-8") as f:
-            json.dump(self.data, f, indent=4, ensure_ascii=False)
-        os.replace(tmp, self.path)
+        try:
+            with open(tmp, "w", encoding="utf-8") as f:
+                json.dump(self.data, f, indent=4, ensure_ascii=False)
+            os.replace(tmp, self.path)
+        except Exception:
+            try:
+                os.remove(tmp)
+            except OSError:
+                pass
+            raise
         self.dirty = False
         return backup
 

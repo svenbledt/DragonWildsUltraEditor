@@ -1,6 +1,5 @@
 """Launch screen: pick a character save from the game's save folder."""
 import datetime
-import os
 from tkinter import filedialog
 
 import customtkinter as ctk

@@ -78,6 +78,12 @@ def test_set_identity_mode_change_regenerates_guid():
     assert sf.data["meta_data"]["char_type"] == 0
 
 
+def test_set_identity_unknown_mode_label_maps_to_normal():
+    sf = _sf_with_guid()
+    character.set_identity(sf, character.get_name(sf.data), character.get_guid(sf.data), "Bogus")
+    assert sf.data["meta_data"]["char_type"] == 0
+
+
 def test_set_identity_rejects_empty():
     sf = _sf()
     with pytest.raises(ValueError):

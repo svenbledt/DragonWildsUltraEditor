@@ -61,4 +61,9 @@ def test_apply_storage_preset():
     assert presets.apply_storage_preset(sf, region, cls) == key
     slots = inv.slots(sf, "storage")
     assert slots
-    assert all(0 <= s <= 20 for s in slots)
+    assert all(0 <= s <= 19 for s in slots)
+
+
+def test_apply_storage_preset_unknown_combo_raises():
+    with pytest.raises(ValueError):
+        presets.apply_storage_preset(_sf(), "Nowhere", "Nobody")

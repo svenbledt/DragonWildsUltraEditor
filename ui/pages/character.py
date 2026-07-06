@@ -63,3 +63,4 @@ class CharacterPage(ctk.CTkFrame):
         self.guid_var.set(written)
         self.app.mark_dirty()
         self.app.set_status("Character updated — press Save to keep.")
+        self.refresh()

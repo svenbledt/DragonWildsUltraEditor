@@ -12,7 +12,7 @@ Umbral Sands PL7 (endgame). For each region x combat style (Melee / Ranged /
 Magic) we pick the strongest kit at that Power Level.
 
 Item picks are verified against the official wiki as of game version 0.12.0.8
-(July 2026) AND confirmed present in this save's item_ids.py:
+(July 2026) AND confirmed present in data/item_ids.py:
   - Melee  armour: Bronze->Iron->Steel->Black Knight(PL6)->Adamant(PL7)
   - Ranged armour: Leather->Studded->Green D'hide->Blue D'hide(PL6)->Red Dragon(PL7)
   - Magic  armour: Wizard->Dragonkin->Splitbark->Mystic(PL6)->Infinity Robes(PL7)

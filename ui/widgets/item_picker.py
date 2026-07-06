@@ -18,7 +18,7 @@ class ItemPicker(ctk.CTkToplevel):
         self.transient(master)
         self.grab_set()
 
-        id_to_name, self.name_to_id, _, _ = inv.item_maps()
+        _, self.name_to_id, _, _ = inv.item_maps()
         self.names = sorted(self.name_to_id)
 
         self.search_var = ctk.StringVar()

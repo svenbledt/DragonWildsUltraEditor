@@ -1,5 +1,7 @@
 """Unlocks: one card per category with progress + Unlock all, plus the
 map-reveal and status-reset actions."""
+from tkinter import messagebox
+
 import customtkinter as ctk
 
 from core import unlocks
@@ -64,6 +66,9 @@ class UnlocksPage(ctk.CTkFrame):
         self.app.set_status("Map revealed — press Save to keep.")
 
     def _reset(self):
+        if not messagebox.askyesno("Reset health & status",
+                                   "Reset health and status effects?"):
+            return
         try:
             unlocks.reset_status(self.app.save)
         except ValueError as e:
