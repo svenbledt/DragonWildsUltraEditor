@@ -100,6 +100,10 @@ class SaveFile:
         if os.path.exists(self.path):
             stamp = datetime.now().strftime("%Y%m%d-%H%M%S-%f")
             backup = "{}.bak-{}".format(self.path, stamp)
+            n = 1
+            while os.path.exists(backup):
+                backup = "{}.bak-{}-{}".format(self.path, stamp, n)
+                n += 1
             with open(self.path, "rb") as src, open(backup, "wb") as dst:
                 dst.write(src.read())
             self._prune_backups()

@@ -1,8 +1,8 @@
 import json
 import os
-import time
 import pytest
 from collections import OrderedDict
+from datetime import datetime
 
 from core.save_file import (
     SaveFile, SaveError,
@@ -85,6 +85,28 @@ def test_backup_rotation_keeps_newest(tmp_path):
         sf.save()
     baks = [f for f in os.listdir(tmp_path) if ".bak-" in f]
     assert len(baks) == BACKUP_KEEP
+
+
+def test_backup_name_collision_gets_suffix(tmp_path, monkeypatch):
+    """Two saves in the same microsecond must produce two backup files."""
+    import core.save_file as save_file_mod
+
+    class FrozenDatetime:
+        @staticmethod
+        def now():
+            return datetime(2026, 7, 6, 12, 0, 0, 123456)
+
+    monkeypatch.setattr(save_file_mod, "datetime", FrozenDatetime)
+    sf = _make_save(tmp_path)
+    sf.mark_dirty()
+    sf.save()
+    sf.mark_dirty()
+    sf.save()
+    # Glob for all .bak- files in tmp_path
+    baks = sorted([f for f in os.listdir(tmp_path) if ".bak-" in f])
+    assert len(baks) == 2, "Expected two distinct backup files"
+    # Verify they have different names
+    assert baks[0] != baks[1]
 
 
 def test_save_without_path_raises(tmp_path):
