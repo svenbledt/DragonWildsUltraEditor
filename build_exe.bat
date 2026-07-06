@@ -12,8 +12,13 @@ REM
 REM  Uses an isolated build venv (.venv-build) so it never
 REM  touches your global Python. Bundles CustomTkinter, the
 REM  data\icons item-icon set, and the app icon/about image.
-REM  tools\ue4ss_dumper\ is dev-only and is NOT bundled (main.py never
+REM  tools\ is dev-only and is NOT bundled (main.py never
 REM  imports it).
+REM
+REM  This script ONLY compiles + zips. For the full release
+REM  pipeline (extract game data + icons from the paks,
+REM  regenerate the data tables, run tests, then build),
+REM  double-click make_dist.bat instead.
 REM
 REM  Requires a C compiler. This build was verified with MSVC
 REM  (Visual Studio 2022 Build Tools). If MSVC is missing,
