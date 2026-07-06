@@ -27,6 +27,11 @@ cd /d "%~dp0"
 set "APPNAME=DragonWildsUltraEditor"
 set "VENV=.venv-build"
 set "VPY=%VENV%\Scripts\python.exe"
+REM Compile OUTSIDE the project tree: cloud-sync clients (Google Drive etc.)
+REM watching this folder race Nuitka's scratch files mid-build and crash it
+REM (observed twice: main.dist and module.PIL.c vanished during compilation).
+REM Only the finished app folder and zip are placed into dist\ at the end.
+set "BUILDDIR=%LOCALAPPDATA%\DragonWildsUltraEditor-build"
 
 echo(
 echo ============================================================
@@ -64,6 +69,7 @@ if errorlevel 1 ( echo [ERROR] Installing Nuitka failed. & goto :fail )
 
 REM --- 4. Clean previous build output -------------------------
 echo [4/6] Cleaning previous build artifacts ...
+if exist "%BUILDDIR%" rmdir /s /q "%BUILDDIR%"
 if exist "dist\main.build" rmdir /s /q "dist\main.build"
 if exist "dist\main.dist" rmdir /s /q "dist\main.dist"
 if exist "dist\%APPNAME%" rmdir /s /q "dist\%APPNAME%"
@@ -106,23 +112,24 @@ echo [5/6] Compiling with Nuitka (first run can take several minutes) ...
     --product-version=13.0.0.0 ^
     --assume-yes-for-downloads ^
     --msvc=latest ^
-    --output-dir=dist ^
+    --output-dir="%BUILDDIR%" ^
     --output-filename=%APPNAME%.exe ^
     main.py
 if errorlevel 1 ( echo [ERROR] Nuitka build failed. See the log above. & goto :fail )
 
-if not exist "dist\main.dist\%APPNAME%.exe" (
+if not exist "%BUILDDIR%\main.dist\%APPNAME%.exe" (
     echo [ERROR] Build reported success but the exe is missing.
     goto :fail
 )
 
 REM --- 6. Package the folder into a distributable zip ---------
 echo [6/6] Packaging dist\%APPNAME%-standalone.zip ...
-rename "dist\main.dist" "%APPNAME%"
-if errorlevel 1 ( echo [ERROR] Could not rename the build folder. & goto :fail )
+if not exist "dist" mkdir "dist"
+move "%BUILDDIR%\main.dist" "dist\%APPNAME%" >nul
+if errorlevel 1 ( echo [ERROR] Could not move the build folder into dist. & goto :fail )
 powershell -NoProfile -Command "Compress-Archive -Path 'dist\%APPNAME%' -DestinationPath 'dist\%APPNAME%-standalone.zip' -CompressionLevel Optimal"
 if errorlevel 1 ( echo [ERROR] Zipping the standalone folder failed. & goto :fail )
-if exist "dist\main.build" rmdir /s /q "dist\main.build"
+if exist "%BUILDDIR%" rmdir /s /q "%BUILDDIR%"
 
 echo(
 echo ============================================================
