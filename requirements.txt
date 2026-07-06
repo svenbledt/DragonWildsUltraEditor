@@ -1,1 +1,2 @@
-sv-ttk>=2.6
+customtkinter>=5.2
+pillow>=10
