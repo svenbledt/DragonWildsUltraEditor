@@ -102,8 +102,42 @@ def _story_order(objectives):
     return sorted(objectives, key=_objective_sort_key)
 
 
+# Text ids carry no sortable structure; where the dump order is provably
+# wrong the story order is pinned here (wiki walkthrough + the objective
+# texts themselves — the dump listed 'Enter the Umbral Sands' 17th of 18
+# and made FindLastKey the final objective instead of the turn-in).
+# Applied only when the ids still match the dump exactly, so a game
+# update that changes the quest falls back to dump order instead of
+# dropping or inventing objectives.
+_STORY_ORDER_OVERRIDES = {
+    "Quest_UmS_MainQuest": [
+        "EnterUmS",                # enter via the Door at The Bastion
+        "LookForLife",             # signs of life -> Shangruuh
+        "InvestigateGarouProblem",
+        "ReturnToFirstGarou",
+        "FindGarou",               # the Elder in the settlement south
+        "SpeakToIcthlarin",        # Mirror Relay mission briefing
+        "SpeakToGarouElder",       # start earning Alcarrid trust
+        "FirstGarouEarnReputation.NoReputation",
+        "FirstGarouEarnReputation.LowReputation",
+        "FirstGarouEarnReputation.MediumReputation",
+        "FirstGarouEarnReputation.HighReputation",
+        "FirstGarouEarnReputation.MaxReputation",
+        "FindThreeKeys",           # remaining camps' Mirror Lenses
+        "FindLastKey",
+        "RepairTheMirrors",
+        "FightFuzan",              # enter the Fight Caves
+        "SlayFuzan",               # journey through them to Fuzan
+        "ReturnToIcthlarin",       # bring Fuzan's head — turn-in
+    ],
+}
+
+
 for _q in EMBEDDED_QUESTS:
-    if _q["objectives"]:
+    _pinned = _STORY_ORDER_OVERRIDES.get(_q["asset"])
+    if _pinned and sorted(_pinned) == sorted(_q["objectives"]):
+        _q["objectives"] = list(_pinned)
+    elif _q["objectives"]:
         _q["objectives"] = _story_order(_q["objectives"])
 
 

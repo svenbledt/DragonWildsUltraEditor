@@ -260,6 +260,29 @@ def test_objectives_follow_story_order_not_dump_order():
         "DR_Main_Objective_6"
 
 
+def test_ums_main_quest_objectives_follow_wiki_story_order():
+    # text ids, so the order is pinned by hand (wiki walkthrough): the
+    # dump listed 'Enter the Umbral Sands' 17th of 18 and ended on
+    # FindLastKey instead of the Fuzan's-head turn-in
+    ums = _quest("Quest_UmS_MainQuest")
+    o = ums["objectives"]
+    assert o[0] == "EnterUmS"
+    assert o[-1] == "ReturnToIcthlarin"
+    assert quests.final_objective(ums) == "ReturnToIcthlarin"
+    assert o.index("SpeakToIcthlarin") < o.index(
+        "FirstGarouEarnReputation.NoReputation")
+    assert o.index("FirstGarouEarnReputation.MaxReputation") \
+        < o.index("FindThreeKeys") < o.index("FindLastKey") \
+        < o.index("RepairTheMirrors") < o.index("SlayFuzan")
+
+
+def test_story_order_overrides_match_dumped_objectives():
+    # a game update that changes a pinned quest must fail the build
+    # (the override silently falls back to dump order at runtime)
+    for asset, pinned in quests._STORY_ORDER_OVERRIDES.items():
+        assert sorted(pinned) == sorted(_quest(asset)["objectives"]), asset
+
+
 def test_text_id_objectives_keep_dump_order():
     slayer = _quest("Quest_DragonSlayer")["objectives"]
     assert slayer[0] == "Claim a bed"
