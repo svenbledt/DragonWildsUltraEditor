@@ -1,0 +1,58 @@
+items DataPaths:
+  /Game/Gameplay/Items
+  /Game/Gameplay/Character/Player
+  /FutureMajorVersion/Gameplay/Items
+  /FutureMajorVersion/Gameplay/Character/Player
+  /DowdunReach/Gameplay/Items
+  /DowdunReach/Gameplay/Character/Player
+  /UmbralSands/Gameplay/Items
+  /UmbralSands/Gameplay/Character/Player
+  /ScornedWilderness/Gameplay/Items
+  /ScornedWilderness/Gameplay/Character/Player
+  /ThrowableChinchompa/Chinchompa
+  /Quests_Banked/Gameplay/Items
+  /Quests_Banked/Gameplay/Character/Player
+  /Fishing/Gameplay/Items
+  /Fishing/Gameplay/Character/Player
+  /Agility/Gameplay/Items
+  /Agility/Gameplay/Character/Player
+  /Prayer/Gameplay/Items
+  /Prayer/Gameplay/Character/Player
+recipes DataPaths:
+  /Game/Gameplay/Items
+  /Game/Gameplay/Character/Player
+  /FutureMajorVersion/Gameplay/Items
+  /FutureMajorVersion/Gameplay/Character/Player
+  /DowdunReach/Gameplay/Items
+  /DowdunReach/Gameplay/Character/Player
+  /UmbralSands/Gameplay/Items
+  /UmbralSands/Gameplay/Character/Player
+  /ScornedWilderness/Gameplay/Items
+  /ScornedWilderness/Gameplay/Character/Player
+  /Quests_Banked/Gameplay/Items
+  /Quests_Banked/Gameplay/Character/Player
+  /Fishing/Gameplay/Items
+  /Fishing/Gameplay/Character/Player
+  /Agility/Gameplay/Items
+  /Agility/Gameplay/Character/Player
+  /Prayer/Gameplay/Items
+  /Prayer/Gameplay/Character/Player
+buildings DataPaths:
+  /Game/Gameplay/BaseBuilding/Data/BuildingPieces
+  /Game/Gameplay/BaseBuilding_New
+  /FutureMajorVersion/Gameplay/BaseBuilding/Data/BuildingPieces
+  /FutureMajorVersion/Gameplay/BaseBuilding_New
+  /DowdunReach/Gameplay/BaseBuilding
+  /UmbralSands/Gameplay/BaseBuilding
+  /UmbralSands/Gameplay/Buildpieces
+  /ScornedWilderness/Gameplay/BaseBuilding
+  /Fishing/Gameplay/BaseBuilding
+  /Prayer/Gameplay/BaseBuilding
+  /Agility/Gameplay/BaseBuilding
+mounts DataPaths:
+  /Game/Gameplay/Mounts
+packages scanned: 14349, load errors: 0
+items: 1392 registered + 0 unregistered (junk)
+recipes: 1103 registered + 7 unregistered (junk)
+buildings: 772 registered + 0 unregistered (junk)
+mounts: 16 registered + 5 unregistered (junk)

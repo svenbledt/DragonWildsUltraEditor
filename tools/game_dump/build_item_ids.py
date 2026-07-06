@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
 """
-build_item_ids.py - update item_ids.py for the DragonWilds Ultra Editor from the
-ItemDumper UE4SS dump (ItemDumper_items.jsonl).
+build_item_ids.py - update item_ids.py for the DragonWilds Ultra Editor from
+the static item dump (ItemDumper_items.jsonl, produced by
+`tools/icon_extractor --dump-data` straight from the game paks).
 
 MERGE model (important):
-  * Existing entries (matched by PersistenceID) are kept EXACTLY as-is. The game
-    reports item names localized to the user's language (e.g. German), so we must
-    not overwrite the curated English names / fields already in item_ids.py.
-  * Only genuinely NEW PersistenceIDs (not already in item_ids.py) are appended.
-    Their name comes from the asset path (__fullname, language-neutral) when
-    possible, else the localized Name.
+  * Existing entries (matched by PersistenceID) are kept EXACTLY as-is - we
+    never overwrite the curated names / fields already in item_ids.py.
+  * Only genuinely NEW PersistenceIDs (not already in item_ids.py) are
+    appended. The static dump's SourceString is always the authored English
+    name (cooked FText), so new names come out clean.
 
-Workflow (see build_item_ids.bat):
-  1. In-game, load a world and press F8 -> produces ItemDumper_items.jsonl.
+Workflow:
+  1. `dotnet run -- --dump-data` in tools/icon_extractor -> refreshes the
+     jsonl dumps here.
   2. Run this script. It prints an analysis and, unless --dry-run, writes a new
      item_ids.py (old one backed up to item_ids.py.bak).
 """
@@ -24,21 +25,16 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 PROJECT = os.path.dirname(os.path.dirname(HERE))  # repo root; data/item_ids.py lives under data/
-GAME_WIN64 = r"F:\SteamLibrary\steamapps\common\RSDragonwilds\RSDragonwilds\Binaries\Win64"
 DEFAULT_DUMP_CANDIDATES = [
     os.path.join(HERE, "ItemDumper_items.jsonl"),
-    os.path.join(GAME_WIN64, "ItemDumper_items.jsonl"),
-    os.path.join(GAME_WIN64, "ue4ss", "ItemDumper_items.jsonl"),
 ]
 
-# The game's Name property carries the clean localized display name (English
-# when the game is set to English). Prefer it; fall back to the asset path only
-# when Name is empty.
-NAME_FIELDS = ["Name", "DisplayName", "ItemName", "SourceString"]
+# The static dump's SourceString is the authored (English) display name.
+NAME_FIELDS = ["SourceString", "Name", "DisplayName", "ItemName"]
 
 # Dev/removed assets that live in the build but are not real player items.
 # Matched against the asset path (__fullname). Filtered from NEW items only.
-JUNK_RE = re.compile(r"(/Deleted/|Deprecated|_Test|Placeholder|DebugOnly|DoNotUse)", re.I)
+JUNK_RE = re.compile(r"(/Deleted/|_Test|Placeholder|DebugOnly|DoNotUse)", re.I)
 
 
 def find_dump(explicit):
@@ -170,7 +166,8 @@ def main():
 
     dump = find_dump(args.dump)
     if not dump:
-        print("ERROR: dump file not found. Run the F8 dump in-game first.")
+        print("ERROR: dump file not found. Run `dotnet run -- --dump-data` "
+              "in tools/icon_extractor first.")
         print("Looked in:\n  " + "\n  ".join(DEFAULT_DUMP_CANDIDATES))
         sys.exit(1)
     print(f"Reading dump: {dump}")
@@ -205,7 +202,9 @@ def main():
     if not args.include_junk:
         kept_new = []
         for p in new_pids:
-            if JUNK_RE.search(dump_pids[p].get("__fullname", "")):
+            r = dump_pids[p]
+            if (not r.get("__registered", True)
+                    or JUNK_RE.search(r.get("__fullname", ""))):
                 junk_pids.append(p)
             else:
                 kept_new.append(p)

@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-build_recipe_ids.py - rebuild EMBEDDED_RECIPE_IDS in data/unlock_ids.py from the
-ItemDumper recipe dump (ItemDumper_recipes.jsonl).
+build_recipe_ids.py - rebuild EMBEDDED_RECIPE_IDS in data/unlock_ids.py from
+the static recipe dump (ItemDumper_recipes.jsonl, produced by
+`tools/icon_extractor --dump-data` straight from the game paks).
 
 Recipes are a separate asset class / id namespace from items, so they get their
 own dump file and their own converter. This script:
@@ -14,27 +15,31 @@ own dump file and their own converter. This script:
 import argparse
 import json
 import os
-import re
 import sys
 import glob
 
-# FindAllOf("RecipeData") also returns dev/test/deprecated recipe assets whose
-# PersistenceIDs the game's recipe registry does NOT accept. Under
-# dom.PersistenceStrictMode:1 a single unrecognized id in RecipesUnlocked aborts
-# the entire character load ("Unknown id in RecipesUnlocked entry ..." ->
-# CharCantLoad). We drop anything whose asset path/name carries a dev/removed
-# marker, UNLESS a real save proves that exact id is genuinely unlockable.
-JUNK_RE = re.compile(
-    r"(?i)(/|_|\b)(test|alphatest|deprecat|depreciat|delet|debug|dummy|"
-    r"placeholder|prototype|futuremajorversion|sandbox|scratch|/dev/|example)")
-
 HERE = os.path.dirname(os.path.abspath(__file__))
 PROJECT = os.path.dirname(os.path.dirname(HERE))  # repo root
-GAME_WIN64 = r"F:\SteamLibrary\steamapps\common\RSDragonwilds\RSDragonwilds\Binaries\Win64"
 DUMP_CANDIDATES = [
     os.path.join(HERE, "ItemDumper_recipes.jsonl"),
-    os.path.join(GAME_WIN64, "ItemDumper_recipes.jsonl"),
 ]
+
+
+def is_junk(rec):
+    """True if this recipe id would break (or pointlessly bloat) a save.
+
+    The game's RecipeSubsystem registers ONLY assets under its DefaultGame.ini
+    +DataPaths folders; an id outside them in RecipesUnlocked aborts the
+    strict-mode load ("Unknown id ..." -> CharCantLoad). The static dump
+    records that as __registered. Of the registered ones, /Deleted/ folders
+    and the AlphaTest cape are dead content the game never grants - keep them
+    out too. NOTE: /Deprecated/-folder recipes ARE registered on purpose (the
+    game AlwaysCooks those folders) and belong in the unlocker.
+    """
+    if not rec.get("__registered"):
+        return True
+    fn = rec.get("__fullname", "") or ""
+    return "/Deleted/" in fn or "AlphaTest" in fn
 
 
 def find_dump(explicit):
@@ -137,7 +142,8 @@ def main():
 
     dump = find_dump(args.dump)
     if not dump:
-        print("ERROR: recipe dump not found. Run F8 in-game first.")
+        print("ERROR: recipe dump not found. Run "
+              "`dotnet run -- --dump-data` in tools/icon_extractor first.")
         print("Looked in:\n  " + "\n  ".join(DUMP_CANDIDATES))
         sys.exit(1)
     print(f"Reading recipe dump: {dump}")
@@ -156,23 +162,21 @@ def main():
     print(f"  MISSING from dump:{len(missing)}  <- dump did not find these")
     print(f"  new from dump:    {len(dumped - known)}")
 
-    # Identify junk by ASSET FOLDER from the live dump (/Test/, /Deprecated/,
-    # /Deleted/, /FutureMajorVersion/, *AlphaTest). This is version-proof: those
-    # folders are never shippable recipes no matter how many real recipes a
-    # future update adds, so there is NO count threshold that could break. A
-    # poisoned save's junk ids resolve to these same folders and get removed too.
+    # Identify junk via the registry (__registered from DefaultGame.ini
+    # DataPaths) + dead-content folders - see is_junk(). This is version-proof:
+    # there is NO count threshold that could break on a big future update. A
+    # poisoned save's junk ids resolve to these same records and get removed.
     junk_pids, junk_names = set(), []
     for pid, r in pids.items():
-        fn = r.get("__fullname", "")
-        path = fn.split(" ", 1)[1] if " " in fn else fn
-        if path and JUNK_RE.search(path):
+        if is_junk(r):
+            fn = r.get("__fullname", "")
+            path = fn.split(" ", 1)[1] if " " in fn else fn
             junk_pids.add(pid)
             junk_names.append(path.rsplit("/", 1)[-1].rsplit(".", 1)[0])
 
-    # Union so we never lose a real recipe the dump missed, minus folder-junk.
+    # Union so we never lose a real recipe the dump missed, minus junk.
     final = sorted((dumped | known) - junk_pids)
-    print(f"\nDropped {len(junk_pids)} dev/test/deprecated recipe(s) "
-          f"(by asset folder - never shipped):")
+    print(f"\nDropped {len(junk_pids)} unregistered/dead recipe(s):")
     for nm in sorted(junk_names)[:15]:
         print(f"    {nm}")
     if len(junk_names) > 15:

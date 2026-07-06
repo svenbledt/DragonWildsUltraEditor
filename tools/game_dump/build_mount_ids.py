@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """
 build_mount_ids.py - rebuild EMBEDDED_MOUNT_TAGS in data/unlock_ids.py from the
-ItemDumper mount dump (ItemDumper_mounts.jsonl).
+static mount dump (ItemDumper_mounts.jsonl, produced by
+`tools/icon_extractor --dump-data` straight from the game paks).
 
 Mounts are unlocked in the save via Character.Mount.MountsUnlockedList, which
 holds two kinds of entries:
   * per-variant refs:  "MountDataAsset:DA_Mount_Terrorbird_00_00"
   * a per-type tag:    "TAG.Mounts.Type.Terrorbird"
-The dumper enumerates the real MountDataAsset objects and records each one's full
+The dump enumerates the real MountDataAsset objects and records each one's full
 name. This script turns those into the exact "MountDataAsset:<assetname>" unlock
 strings, derives the "TAG.Mounts.Type.<Type>" tags from the asset names, unions
 everything with what's already known (save files + current embedded list), and
@@ -22,10 +23,8 @@ import glob
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 PROJECT = os.path.dirname(os.path.dirname(HERE))  # repo root
-GAME_WIN64 = r"F:\SteamLibrary\steamapps\common\RSDragonwilds\RSDragonwilds\Binaries\Win64"
 DUMP_CANDIDATES = [
     os.path.join(HERE, "ItemDumper_mounts.jsonl"),
-    os.path.join(GAME_WIN64, "ItemDumper_mounts.jsonl"),
 ]
 
 # "MountDataAsset /path/DA_Mount_Terrorbird_00_00.DA_Mount_Terrorbird_00_00"
@@ -71,8 +70,9 @@ def tags_from_records(recs):
     for r in recs:
         cls = r.get("__class", "")
         fn = r.get("__fullname", "")
-        # only the real mount assets produce unlock strings
-        if "MountDataAsset" not in cls and not fn.startswith("MountDataAsset "):
+        # only the real mount assets produce unlock strings; the static dump
+        # writes BP subclasses (BP_Mount_Terrorbird_C, ...) of MountDataAsset
+        if "Mount" not in cls and not fn.startswith("MountDataAsset "):
             continue
         an = asset_name(fn)
         if not an:
@@ -163,7 +163,8 @@ def main():
 
     dump = find_dump(args.dump)
     if not dump:
-        print("ERROR: mount dump not found. Run F8 in-game with the updated mod first.")
+        print("ERROR: mount dump not found. Run `dotnet run -- --dump-data` "
+              "in tools/icon_extractor first.")
         print("Looked in:\n  " + "\n  ".join(DUMP_CANDIDATES))
         sys.exit(1)
     print(f"Reading mount dump: {dump}")

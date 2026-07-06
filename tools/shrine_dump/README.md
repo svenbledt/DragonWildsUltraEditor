@@ -3,7 +3,7 @@
 Extracts the **complete** set of Sanguine Urns straight from the cooked game
 files, so we don't have to roam the whole map in-game. This is how the 18 urn
 GUIDs in `../build_shrine_ids.py` (`KNOWN_SHRINE_IDS`) were obtained (path is
-relative to `tools/ue4ss_dumper/`).
+relative to this folder).
 
 ## What it does
 

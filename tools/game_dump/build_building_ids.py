@@ -1,21 +1,22 @@
 #!/usr/bin/env python3
 """
-build_building_ids.py - rebuild EMBEDDED_BUILDING_IDS in data/unlock_ids.py from the
-ItemDumper building dump (ItemDumper_buildings.jsonl).
+build_building_ids.py - rebuild EMBEDDED_BUILDING_IDS in data/unlock_ids.py
+from the static building dump (ItemDumper_buildings.jsonl, produced by
+`tools/icon_extractor --dump-data` straight from the game paks).
 
 Build pieces are unlocked in the save via Progress.BuildingsUnlocked - a SEPARATE
-asset class / id namespace from items and recipes (verified: zero overlap). The
-mod scans many candidate class names, so the dump may include an accidental
-non-building class. This converter is deliberately conservative because a single
-unrecognized id in BuildingsUnlocked corrupts the save under
-dom.PersistenceStrictMode:1 (exactly like recipes):
+asset class / id namespace from items and recipes (verified: zero overlap). This
+converter is deliberately conservative because a single unrecognized id in
+BuildingsUnlocked corrupts the save under dom.PersistenceStrictMode:1 (exactly
+like recipes):
 
   1. CONFIRM the real building class(es) by overlap with what your saves already
      have in BuildingsUnlocked (a class whose dumped ids show up as unlocked
      buildings in a real save IS the building class). Falls back to name-based
      detection only if no save is available.
-  2. Strip dev/test/deprecated junk by ASSET FOLDER (/Test/, /Deprecated/, ...),
-     the same version-proof filter the recipe converter uses (NO count threshold).
+  2. Strip anything the game's BuildingPieceSubsystem does not register
+     (__registered from DefaultGame.ini +DataPaths - see is_junk()). Registered
+     pieces stay in even when NAMED "DEPRECATED": the game accepts them.
   3. Union with ids proven-real by your saves so we never drop a real building.
 """
 import argparse
@@ -25,11 +26,11 @@ import re
 import sys
 import glob
 
-# Same folder-junk filter as recipes: dev/removed asset folders are never
-# shippable, no matter how many real buildings a future update adds.
-JUNK_RE = re.compile(
-    r"(?i)(/|_|\b)(test|alphatest|deprecat|depreciat|delet|debug|dummy|"
-    r"placeholder|prototype|futuremajorversion|sandbox|scratch|/dev/|example)")
+
+def is_junk(rec):
+    """True if the game's building registry would reject this id."""
+    return not rec.get("__registered")
+
 
 # If no save is available to confirm the class, fall back to class/path names
 # that clearly denote buildings.
@@ -37,10 +38,8 @@ NAME_HINT_RE = re.compile(r"(?i)(build|buildable|construct|structure|placeable)"
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 PROJECT = os.path.dirname(os.path.dirname(HERE))  # repo root
-GAME_WIN64 = r"F:\SteamLibrary\steamapps\common\RSDragonwilds\RSDragonwilds\Binaries\Win64"
 DUMP_CANDIDATES = [
     os.path.join(HERE, "ItemDumper_buildings.jsonl"),
-    os.path.join(GAME_WIN64, "ItemDumper_buildings.jsonl"),
 ]
 
 
@@ -148,8 +147,8 @@ def main():
 
     dump = find_dump(args.dump)
     if not dump:
-        print("ERROR: building dump not found. Run F8 in-game (with the updated "
-              "mod) first, then build_item_ids.bat to copy it here.")
+        print("ERROR: building dump not found. Run "
+              "`dotnet run -- --dump-data` in tools/icon_extractor first.")
         print("Looked in:\n  " + "\n  ".join(DUMP_CANDIDATES))
         sys.exit(1)
     print(f"Reading building dump: {dump}")
@@ -194,14 +193,14 @@ def main():
 
     candidate = set().union(*confirmed.values()) if confirmed else set()
 
-    # 2) strip folder-junk (version-proof)
-    junk = {p for p in candidate if JUNK_RE.search(path_of(recs.get(p, {})))}
+    # 2) strip anything the game's registry does not accept (version-proof)
+    junk = {p for p in candidate if is_junk(recs.get(p, {}))}
     junk_names = sorted(path_of(recs[p]).rsplit("/", 1)[-1].rsplit(".", 1)[0] for p in junk)
 
     # 3) union with proven-real + current embedded so we never lose a building
     final = sorted((candidate - junk) | proven | embedded_buildings())
 
-    print(f"\nDropped {len(junk)} dev/test/deprecated building(s) (by asset folder):")
+    print(f"\nDropped {len(junk)} unregistered building(s):")
     for nm in junk_names[:15]:
         print(f"    {nm}")
     if len(junk_names) > 15:
