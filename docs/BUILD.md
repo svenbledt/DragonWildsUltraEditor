@@ -44,6 +44,13 @@ py -m nuitka --standalone --enable-plugin=tk-inter --include-package-data=custom
    --include-data-files=Dragonwilds_Editor.ico=Dragonwilds_Editor.ico ^
    --include-data-files=Dragonwilds_Editor.png=Dragonwilds_Editor.png ^
    --windows-console-mode=disable --windows-icon-from-ico=Dragonwilds_Editor.ico ^
+   --company-name="DragonWilds Ultra Editor" ^
+   --product-name="DragonWilds Ultra Editor" ^
+   --file-description="DragonWilds Ultra Save Editor" ^
+   --file-version=13.0.0.0 ^
+   --product-version=13.0.0.0 ^
+   --assume-yes-for-downloads ^
+   --msvc=latest ^
    --output-dir=dist --output-filename=DragonWildsUltraEditor.exe main.py
 ```
 
