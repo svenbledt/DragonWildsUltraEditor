@@ -48,6 +48,11 @@ class Program
             return 0;
         }
 
+        // --quests [raw <name> | rawpkg <substr> | enums]: quest definition dump
+        // (see QuestDiscovery.cs). Writes quests_dump.json in the project dir.
+        if (args.Length >= 1 && args[0] == "--quests")
+            return QuestDiscovery.Run(args);
+
         // args: [paksDir] [usmapPath] [iconlistPath] [outDir] [onlyStem] [mode] [itemsJsonlPath]
         string paks   = args.Length > 0 && !string.IsNullOrEmpty(args[0]) ? args[0] : @"F:\SteamLibrary\steamapps\common\RSDragonwilds\RSDragonwilds\Content\Paks";
         string usmap  = args.Length > 1 && !string.IsNullOrEmpty(args[1]) ? args[1] : @"F:\SteamLibrary\steamapps\common\RSDragonwilds\RSDragonwilds\Binaries\Win64\ue4ss\Mappings.usmap";

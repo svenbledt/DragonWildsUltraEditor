@@ -20,6 +20,7 @@ PAGES = [
     ("skills", "Skills", "ui.pages.skills", "SkillsPage"),
     ("inventory", "Inventory", "ui.pages.inventory", "InventoryPage"),
     ("storage", "Storage", "ui.pages.storage", "StoragePage"),
+    ("quests", "Quests", "ui.pages.quests", "QuestsPage"),
     ("unlocks", "Unlocks", "ui.pages.unlocks", "UnlocksPage"),
 ]
 
