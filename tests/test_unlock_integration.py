@@ -4,7 +4,7 @@ import os
 import unittest
 
 import unlock_ops as uo
-import pickup_ids
+import data.pickup_ids as pickup_ids
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 FIXTURE = os.path.join(HERE, "fixtures", "mini_save.json")
@@ -41,7 +41,7 @@ class PickupUnlockTests(unittest.TestCase):
 
 class ShrineUnlockTests(unittest.TestCase):
     def test_unions_urns_without_touching_health(self):
-        import shrine_ids
+        import data.shrine_ids as shrine_ids
         data = load_fixture()
         before_health = copy.deepcopy(data["Character"]["Health"])
         added, total = uo.unlock_section(data, "ShrinesUnlocked",
@@ -56,7 +56,7 @@ class ShrineUnlockTests(unittest.TestCase):
         self.assertEqual(data["Character"]["Health"], before_health)
 
     def test_computed_max_hp_matches_count(self):
-        import shrine_ids
+        import data.shrine_ids as shrine_ids
         data = load_fixture()
         uo.unlock_section(data, "ShrinesUnlocked", shrine_ids.EMBEDDED_SHRINE_IDS)
         n = len(data["Progress"]["ShrinesUnlocked"])

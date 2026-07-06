@@ -5,15 +5,15 @@ from collections import OrderedDict
 import base64
 
 # === LOAD ITEM LIST FROM PYTHON FILE ===
-from item_ids import ITEM_LIST
+from data.item_ids import ITEM_LIST
 
 # Region x Class storage kits (endgame BiS gear + best-in-slot food/potions per
 # region) come from the shared preset module, so gear and storage stay in sync.
-from loadout_presets import STORAGE_PRESETS, REGIONS, CLASSES, preset_key
+from data.loadout_presets import STORAGE_PRESETS, REGIONS, CLASSES, preset_key
 
 # Shared item-map builder that disambiguates duplicate names (e.g. the 4
 # Ascension Core power levels) so every catalog record is selectable.
-from item_maps import build_item_maps
+from data.item_maps import build_item_maps
 
 def generate_guid():
     return base64.urlsafe_b64encode(os.urandom(16)).decode('utf-8').rstrip('=')

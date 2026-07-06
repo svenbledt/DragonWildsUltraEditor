@@ -26,7 +26,7 @@ refs) is copied verbatim from the proven working loadouts - we only swap the
 ItemData id per slot, so equip behaviour is unchanged.
 """
 from collections import OrderedDict
-from item_ids import ITEM_LIST
+from data.item_ids import ITEM_LIST
 
 # ---------------------------------------------------------------------------
 # name <-> id maps

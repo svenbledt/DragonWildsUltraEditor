@@ -7,7 +7,7 @@ ever references one - in the inventory OR the storage kit.
 """
 import unittest
 
-import loadout_presets as lp
+import data.loadout_presets as lp
 
 
 def _placed_pids(section):
