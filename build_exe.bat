@@ -1,12 +1,23 @@
 @echo off
 REM ============================================================
-REM  DragonWilds: Ultra Editor - single-file EXE builder
+REM  DragonWilds: Ultra Editor - native EXE builder (Nuitka)
 REM
-REM  Builds dist\DragonWildsUltraEditor.exe from launcher.py.
+REM  Compiles main.py to a native machine-code .exe with
+REM  Nuitka (Python -> C -> real binary). This is used instead
+REM  of PyInstaller to:
+REM    * avoid the antivirus false-positives that got the old
+REM      PyInstaller --onefile build flagged/deleted on Nexus,
+REM    * ship a compiled binary with no extractable .pyc source.
+REM
 REM  Uses an isolated build venv (.venv-build) so it never
-REM  touches your global Python. Bundles the sv-ttk (Sun Valley)
-REM  theme via --collect-data. ue4ss_dumper\ is dev-only and is
-REM  NOT bundled (launcher.py never imports it).
+REM  touches your global Python. Bundles CustomTkinter, the
+REM  data\icons item-icon set, and the app icon/about image.
+REM  ue4ss_dumper\ is dev-only and is NOT bundled (main.py never
+REM  imports it).
+REM
+REM  Requires a C compiler. This build was verified with MSVC
+REM  (Visual Studio 2022 Build Tools). If MSVC is missing,
+REM  Nuitka will offer to download MinGW-w64 automatically.
 REM
 REM  Just double-click this file, or run it from a terminal.
 REM ============================================================
@@ -19,7 +30,7 @@ set "VPY=%VENV%\Scripts\python.exe"
 
 echo(
 echo ============================================================
-echo  Building %APPNAME%.exe
+echo  Building %APPNAME%.exe  (Nuitka native compile)
 echo ============================================================
 
 REM --- 1. Require the Python launcher -------------------------
@@ -33,54 +44,86 @@ if errorlevel 1 (
 
 REM --- 2. Create the isolated build venv ----------------------
 if not exist "%VPY%" (
-    echo [1/5] Creating build virtual environment "%VENV%" ...
+    echo [1/6] Creating build virtual environment "%VENV%" ...
     py -m venv "%VENV%"
     if errorlevel 1 ( echo [ERROR] Could not create the virtual environment. & goto :fail )
 ) else (
-    echo [1/5] Reusing existing build venv "%VENV%".
+    echo [1/6] Reusing existing build venv "%VENV%".
 )
 
-REM --- 3. Install dependencies + PyInstaller ------------------
-echo [2/5] Upgrading pip ...
+REM --- 3. Install dependencies + Nuitka -----------------------
+echo [2/6] Upgrading pip ...
 "%VPY%" -m pip install --upgrade pip
 if errorlevel 1 ( echo [ERROR] pip upgrade failed. & goto :fail )
 
-echo [3/5] Installing project requirements + PyInstaller ...
+echo [3/6] Installing project requirements + Nuitka ...
 "%VPY%" -m pip install -r requirements.txt
 if errorlevel 1 ( echo [ERROR] Installing requirements.txt failed. & goto :fail )
-"%VPY%" -m pip install pyinstaller
-if errorlevel 1 ( echo [ERROR] Installing PyInstaller failed. & goto :fail )
+"%VPY%" -m pip install --upgrade nuitka
+if errorlevel 1 ( echo [ERROR] Installing Nuitka failed. & goto :fail )
 
 REM --- 4. Clean previous build output -------------------------
-echo [4/5] Cleaning previous build artifacts ...
-if exist "build" rmdir /s /q "build"
-if exist "dist\%APPNAME%.exe" del /q "dist\%APPNAME%.exe"
-if exist "%APPNAME%.spec" del /q "%APPNAME%.spec"
+echo [4/6] Cleaning previous build artifacts ...
+if exist "dist\main.build" rmdir /s /q "dist\main.build"
+if exist "dist\main.dist" rmdir /s /q "dist\main.dist"
+if exist "dist\%APPNAME%" rmdir /s /q "dist\%APPNAME%"
+if exist "dist\%APPNAME%-standalone.zip" del /q "dist\%APPNAME%-standalone.zip"
 
-REM --- 5. Build the single-file, windowed exe -----------------
-echo [5/5] Running PyInstaller (this can take a minute) ...
-"%VPY%" -m PyInstaller ^
-    --noconfirm ^
-    --clean ^
-    --onefile ^
-    --windowed ^
-    --name "%APPNAME%" ^
-    --icon "Dragonwilds_Editor.ico" ^
-    --add-data "Dragonwilds_Editor.ico;." ^
-    --add-data "Dragonwilds_Editor.png;." ^
-    --collect-data sv_ttk ^
-    launcher.py
-if errorlevel 1 ( echo [ERROR] PyInstaller build failed. See the log above. & goto :fail )
+REM --- 5. Compile a standalone (folder) windowed exe ----------
+REM  --standalone       : app + its DLLs in a folder, NO onefile
+REM       self-extracting stub. The stub is what CrowdStrike /
+REM       Symantec / Elastic ML heuristics flag as "dropper-like",
+REM       so the folder form is the least likely to be quarantined.
+REM  --enable-plugin=tk-inter : bundle Tcl/Tk so tkinter/CustomTkinter works when frozen
+REM  --include-package-data=customtkinter : bundle CustomTkinter's theme/asset files
+REM  --include-data-dir=data/icons=data/icons : bundle the 754-icon item-icon set
+REM  --windows-console-mode=disable : no console window (GUI app)
+REM  version/company metadata : unsigned binaries with real metadata look
+REM       far less suspicious to AV heuristics than blank ones
+echo [5/6] Compiling with Nuitka (first run can take several minutes) ...
+"%VPY%" -m nuitka ^
+    --standalone ^
+    --enable-plugin=tk-inter ^
+    --include-package-data=customtkinter ^
+    --include-data-dir=data/icons=data/icons ^
+    --include-data-files=Dragonwilds_Editor.ico=Dragonwilds_Editor.ico ^
+    --include-data-files=Dragonwilds_Editor.png=Dragonwilds_Editor.png ^
+    --windows-console-mode=disable ^
+    --windows-icon-from-ico=Dragonwilds_Editor.ico ^
+    --company-name=DragonWilds Ultra Editor ^
+    --product-name=DragonWilds Ultra Editor ^
+    --file-description=DragonWilds Ultra Save Editor ^
+    --file-version=13.0.0.0 ^
+    --product-version=13.0.0.0 ^
+    --assume-yes-for-downloads ^
+    --msvc=latest ^
+    --output-dir=dist ^
+    --output-filename=%APPNAME%.exe ^
+    main.py
+if errorlevel 1 ( echo [ERROR] Nuitka build failed. See the log above. & goto :fail )
 
-if not exist "dist\%APPNAME%.exe" (
-    echo [ERROR] Build reported success but dist\%APPNAME%.exe is missing.
+if not exist "dist\main.dist\%APPNAME%.exe" (
+    echo [ERROR] Build reported success but the exe is missing.
     goto :fail
 )
+
+REM --- 6. Package the folder into a distributable zip ---------
+echo [6/6] Packaging dist\%APPNAME%-standalone.zip ...
+rename "dist\main.dist" "%APPNAME%"
+if errorlevel 1 ( echo [ERROR] Could not rename the build folder. & goto :fail )
+powershell -NoProfile -Command "Compress-Archive -Path 'dist\%APPNAME%' -DestinationPath 'dist\%APPNAME%-standalone.zip' -CompressionLevel Optimal"
+if errorlevel 1 ( echo [ERROR] Zipping the standalone folder failed. & goto :fail )
+if exist "dist\main.build" rmdir /s /q "dist\main.build"
 
 echo(
 echo ============================================================
 echo  BUILD COMPLETE
-echo    dist\%APPNAME%.exe
+echo    Folder : dist\%APPNAME%\%APPNAME%.exe
+echo    Upload : dist\%APPNAME%-standalone.zip
+echo(
+echo  This is the standalone (folder) form - no onefile stub -
+echo  which is the least likely to be quarantined by NexusMods'
+echo  scanner. Upload the .zip to Nexus.
 echo(
 echo  Tip: the app writes settings.json next to wherever the
 echo  exe is launched from. Run it on a COPY of a save first.

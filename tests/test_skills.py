@@ -20,9 +20,11 @@ def test_tables_consistent():
 def test_level_math():
     assert skills.get_level_for_xp(0) == 1
     assert skills.get_level_for_xp(33) == 2
+    assert skills.get_level_for_xp(999999) == 98  # just below the level-99 threshold
     assert skills.get_level_for_xp(1000000) == 99
     assert skills.get_level_for_xp(-5) == 1
     assert skills.get_level_for_xp("junk") == 1
+    assert skills.get_xp_for_level(2) == 33
     assert skills.get_xp_for_level(99) == 1000000
     assert skills.get_xp_for_level(1) == 0
     assert skills.get_xp_for_level(200) == 1000000

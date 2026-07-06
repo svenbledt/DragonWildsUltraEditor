@@ -33,6 +33,19 @@ def test_getters_on_empty_dict():
     assert character.get_mode({}) == "Normal"
 
 
+def test_getters_on_none():
+    assert character.get_name(None) == character.DASH
+    assert character.get_guid(None) == ""
+    assert character.get_mode(None) == "Normal"
+
+
+def test_mode_from_char_type():
+    assert character.get_mode({"meta_data": {"char_type": 0}}) == "Normal"
+    assert character.get_mode({"meta_data": {"char_type": 1}}) == "Hardcore"
+    assert character.get_mode({"meta_data": {"char_type": 3}}) == "Creative"
+    assert character.get_mode({"meta_data": {"char_type": 4}}) == "Custom"
+
+
 def test_random_guid_shape():
     g = character.random_guid()
     assert len(g) == 32 and g == g.upper()
