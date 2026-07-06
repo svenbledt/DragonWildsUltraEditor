@@ -40,6 +40,7 @@ To build by hand:
 
 ```
 py -m nuitka --standalone --enable-plugin=tk-inter --include-package-data=customtkinter ^
+   --include-package=ui --include-package=core --include-package=data ^
    --include-data-dir=data/icons=data/icons ^
    --include-data-files=Dragonwilds_Editor.ico=Dragonwilds_Editor.ico ^
    --include-data-files=Dragonwilds_Editor.png=Dragonwilds_Editor.png ^
@@ -63,6 +64,11 @@ Flag notes:
   of. Without it the app fails to start.
 - `--include-package-data=customtkinter` bundles CustomTkinter's own theme/asset
   files. Without it the frozen app raises on startup.
+- `--include-package=ui --include-package=core --include-package=data` force the
+  app's own packages in. `ui/app.py` loads pages with
+  `importlib.import_module()` from a string table, which Nuitka cannot follow
+  statically — without these flags the frozen exe is missing every page module
+  and each page falls back to the "Coming soon…" placeholder.
 - `--include-data-dir=data/icons=data/icons` bundles the 754-icon item-icon set
   (plus `manifest.json`) used by the inventory/loadout icon grid. Without it the
   grid falls back to blank slots. Regenerate this folder with

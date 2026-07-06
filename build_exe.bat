@@ -76,6 +76,12 @@ REM       Symantec / Elastic ML heuristics flag as "dropper-like",
 REM       so the folder form is the least likely to be quarantined.
 REM  --enable-plugin=tk-inter : bundle Tcl/Tk so tkinter/CustomTkinter works when frozen
 REM  --include-package-data=customtkinter : bundle CustomTkinter's theme/asset files
+REM  --include-package=ui/core/data : ui/app.py loads pages with
+REM       importlib.import_module() from a string table, which Nuitka's
+REM       static analysis cannot follow. Without these the frozen exe is
+REM       missing every page module (and the core/data modules only they
+REM       import) and each page falls back to the "Coming soon..."
+REM       placeholder.
 REM  --include-data-dir=data/icons=data/icons : bundle the 754-icon item-icon set
 REM  --windows-console-mode=disable : no console window (GUI app)
 REM  version/company metadata : unsigned binaries with real metadata look
@@ -85,6 +91,9 @@ echo [5/6] Compiling with Nuitka (first run can take several minutes) ...
     --standalone ^
     --enable-plugin=tk-inter ^
     --include-package-data=customtkinter ^
+    --include-package=ui ^
+    --include-package=core ^
+    --include-package=data ^
     --include-data-dir=data/icons=data/icons ^
     --include-data-files=Dragonwilds_Editor.ico=Dragonwilds_Editor.ico ^
     --include-data-files=Dragonwilds_Editor.png=Dragonwilds_Editor.png ^

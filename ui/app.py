@@ -24,11 +24,20 @@ PAGES = [
 ]
 
 ABOUT_TEXT = (
-    "DragonWilds Ultra Editor v" + APP_VERSION + "\n\n"
-    "An offline save editor for RuneScape: Dragonwilds.\n"
-    "Edit skills, inventory, storage and unlocks — changes are only\n"
+    "A comprehensive save editor for RuneScape: Dragonwilds — edit your "
+    "character, skills, inventory, storage and unlocks. Changes are only "
     "written when you press Save, and a backup is created every time.\n\n"
-    "Maintained by DragonWilds Editor Dev. Not affiliated with Jagex."
+    "This release continues the work of the original creator, "
+    "TatsumaYakoshi, carrying the project forward with a redesigned "
+    "interface, new features and an expanded unlock set."
+)
+
+ABOUT_CREDITS = (
+    "Credits\n"
+    "• Originally created by TatsumaYakoshi\n"
+    "• Continued & maintained by TailwindDev\n"
+    "• Shout out to Elleandria for the help\n\n"
+    "Not affiliated with Jagex."
 )
 
 
@@ -263,11 +272,26 @@ class App(ctk.CTk):
     def show_about(self):
         dlg = ctk.CTkToplevel(self)
         dlg.title("About")
-        dlg.geometry("420x260")
+        dlg.geometry("460x560")
         dlg.transient(self)
         dlg.grab_set()
+        try:
+            from PIL import Image
+            pil = Image.open(os.path.join(app_root(),
+                                          "Dragonwilds_Editor.png"))
+            self._about_img = ctk.CTkImage(light_image=pil, dark_image=pil,
+                                           size=(96, 96))
+            ctk.CTkLabel(dlg, image=self._about_img,
+                         text="").pack(pady=(18, 4))
+        except Exception:
+            pass
+        ctk.CTkLabel(dlg, text=APP_TITLE + " v" + APP_VERSION,
+                     font=ctk.CTkFont(size=16, weight="bold")).pack(
+                         pady=(0, 6))
         ctk.CTkLabel(dlg, text=ABOUT_TEXT, justify="left",
-                     wraplength=380).pack(padx=20, pady=(20, 10),
+                     wraplength=400).pack(padx=24, pady=(4, 8), fill="x")
+        ctk.CTkLabel(dlg, text=ABOUT_CREDITS, justify="left",
+                     wraplength=400).pack(padx=24, pady=(0, 8),
                                           fill="both", expand=True)
         ctk.CTkButton(dlg, text="Close",
                       command=dlg.destroy).pack(pady=(0, 16))

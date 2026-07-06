@@ -12,3 +12,5 @@ Changelog
 5. Added name-based search & filtering across all item lists.
 6. Packaged as a single Windows .exe (no Python needed) with a proper window/taskbar icon.
 7. Redesigned the About screen (icon, description, credits) and made it open on first launch.
+8. Fixed the standalone exe showing "Coming soon..." on every page (the editor pages were missing from the compiled build).
+9. Restored the full About content: app icon, description, and the credits — originally created by TatsumaYakoshi, continued & maintained by TailwindDev, with a shout out to Elleandria.
