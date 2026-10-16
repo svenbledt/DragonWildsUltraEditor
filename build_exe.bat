@@ -123,8 +123,8 @@ echo [5/6] Compiling with Nuitka (first run can take several minutes) ...
     --company-name="DragonWilds Ultra Editor" ^
     --product-name="DragonWilds Ultra Editor" ^
     --file-description="DragonWilds Ultra Save Editor" ^
-    --file-version=13.0.0.0 ^
-    --product-version=13.0.0.0 ^
+    --file-version=13.1.0.0 ^
+    --product-version=13.1.0.0 ^
     --assume-yes-for-downloads ^
     --msvc=latest ^
     --output-dir="%BUILDDIR%" ^

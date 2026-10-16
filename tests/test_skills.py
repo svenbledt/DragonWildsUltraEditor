@@ -12,7 +12,7 @@ def _sf():
 
 
 def test_tables_consistent():
-    assert len(skills.SKILL_IDS) == len(skills.SKILL_LABELS) == 11
+    assert len(skills.SKILL_IDS) == len(skills.SKILL_LABELS) == 12
     assert len(skills.LEVEL_TO_XP) == 99
     assert skills.MAX_LEVEL_XP == 1000000
 
@@ -32,7 +32,7 @@ def test_level_math():
 
 def test_get_skills_fills_missing_with_zero():
     rows = skills.get_skills(_sf())
-    assert len(rows) == 11
+    assert len(rows) == 12
     by_id = {r["id"]: r for r in rows}
     # fixture has Artisan maxed and Attack at 0; the other 9 default to 0
     assert by_id["Wf3i7Ha-B06DH719j1vtBw"]["level"] == 99

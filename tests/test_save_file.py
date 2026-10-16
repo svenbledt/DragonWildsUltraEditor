@@ -57,6 +57,13 @@ def test_mark_dirty():
     assert sf.dirty is True
 
 
+def test_outdated_save_version():
+    assert SaveFile({"Version": 75, "GameProgress": {"Version": 75}}).is_outdated()
+    sf = SaveFile({"Version": 86, "GameProgress": {"Version": 86}})
+    assert sf.version == 86 and not sf.is_outdated()
+    assert not SaveFile({"GameProgress": {}}).is_outdated()   # no version: no warning
+
+
 def _make_save(tmp_path):
     p = tmp_path / "char.json"
     p.write_text(json.dumps({"Progress": {}}), encoding="utf-8")

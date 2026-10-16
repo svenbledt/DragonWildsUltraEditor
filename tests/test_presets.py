@@ -41,7 +41,7 @@ def test_apply_gear_preset_preserves_protected_slots():
     region, cls = _region_class_for(key)
     gear_inv = GEAR_LOADOUTS[key]["Inventory"]
     # a rune-tab slot the template does NOT fill must survive the apply
-    free = next(s for s in range(32, 56) if str(s) not in gear_inv)
+    free = next(s for s in range(40, 72) if str(s) not in gear_inv)
     sentinel = {"GUID": "K" * 22, "ItemData": "keep-me", "Count": 7}
     inv.get_container(sf, "inventory")[str(free)] = dict(sentinel)
     presets.apply_gear_preset(sf, region, cls)

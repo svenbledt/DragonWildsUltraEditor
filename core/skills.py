@@ -10,11 +10,12 @@ SKILL_IDS = [
     "heq7u88Q2UuLXFqLGTVwQw", "NOqC-z-2ckqi0El22qMFlw", "4zYUGF5u_0KbMLkWJmmBbQ",
     "PyUi-0LU_riFY46AnnFiWg",
     "vwY5IkQJJDwb2PKEfoc8MQ",  # Fishing (added in the 0.11 update)
+    "pJggvotwOkuoc98igUn7xA",  # Agility (added in the Agility update)
 ]
 
 SKILL_LABELS = [
     "Artisan", "Attack", "Construction", "Cooking", "Magic", "Mining",
-    "Ranged", "Runecrafting", "Woodcutting", "Farming", "Fishing",
+    "Ranged", "Runecrafting", "Woodcutting", "Farming", "Fishing", "Agility",
 ]
 
 LEVEL_TO_XP = [

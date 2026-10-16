@@ -11,6 +11,11 @@ from datetime import datetime
 
 BACKUP_KEEP = 5
 
+# Save format the editor's slot layout targets (Agility / 1.0.1 build: 40-slot
+# bag, Runes 40-71, Ammo 72-103, Quest 104-175). Older saves keep the old
+# layout until the game migrates them on first load.
+SUPPORTED_SAVE_VERSION = 86
+
 
 def generate_guid():
     """22-char url-safe id, the same shape the game stores per item entry."""
@@ -86,6 +91,17 @@ class SaveFile:
         if isinstance(self.data.get("GameProgress"), dict):
             return self.data["GameProgress"]
         return self.data
+
+    @property
+    def version(self):
+        """The save's format Version, or None when the file has none."""
+        v = self.progress.get("Version", self.data.get("Version"))
+        return v if isinstance(v, int) else None
+
+    def is_outdated(self):
+        """True for saves written by a game build older than the slot
+        layout this editor uses."""
+        return self.version is not None and self.version < SUPPORTED_SAVE_VERSION
 
     def mark_dirty(self):
         self.dirty = True

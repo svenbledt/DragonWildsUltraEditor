@@ -143,10 +143,9 @@ def computed_max_hp(sf):
 
 
 def reveal_map(sf):
-    sf.progress["RevealedFog"] = {
-        "RevealedRegionsBitmap": 4294967295,
-        "RevealedRegionsDetectionActive": True,
-    }
+    # save format 86 dropped RevealedRegionsDetectionActive; the game writes
+    # only the bitmap now
+    sf.progress["RevealedFog"] = {"RevealedRegionsBitmap": 4294967295}
     sf.mark_dirty()
 
 
@@ -175,5 +174,6 @@ def reset_status(sf):
     character["Endurance"] = {"EnduranceValue": 100, "EnduranceDecayBuffer": 0}
     character["Health"] = {"CurrentValue": 100}
     character["Stamina"] = {"CurrentValue": 100}
+    character["SpecialCharge"] = {"CurrentValue": 100}
 
     sf.mark_dirty()

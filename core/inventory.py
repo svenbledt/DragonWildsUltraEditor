@@ -1,7 +1,10 @@
 """Slot-container model shared by Inventory, Loadout and Storage.
 
-Verified slot layout (from real saves — do not change):
-Inventory: Bag 0-31 (0-7 action bar), Runes 32-55, Ammo 56-79, Quest 80-103.
+Slot layout (BP_PlayerController's inventory component InventoryPages,
+matching how the game migrates older saves):
+Inventory: Bag 0-39 (0-7 action bar), Runes 40-71, Ammo 72-103,
+Quest 104-175. Saves before format version 86 used Bag 0-31, Runes 32-55,
+Ammo 56-79, Quest 80-103; the game moves them on first load.
 Storage (PersonalInventory): 0-19.
 """
 from collections import OrderedDict
@@ -17,10 +20,10 @@ CONTAINERS = {
 }
 
 INVENTORY_TABS = [
-    ("Bag", 0, 31),
-    ("Runes", 32, 55),
-    ("Ammo", 56, 79),
-    ("Quest", 80, 103),
+    ("Bag", 0, 39),
+    ("Runes", 40, 71),
+    ("Ammo", 72, 103),
+    ("Quest", 104, 175),
 ]
 STORAGE_RANGE = (0, 19)
 
@@ -65,7 +68,7 @@ def slot_bounds(name, tab=None):
         for label, lo, hi in INVENTORY_TABS:
             if label == tab:
                 return (lo, hi)
-    return (0, 103)
+    return (0, 175)
 
 
 def set_slot(sf, name, slot, item_id, count):

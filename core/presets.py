@@ -6,13 +6,13 @@ Ammo / Quest slots the template doesn't fill (players keep their runes).
 """
 from data.loadout_presets import (
     GEAR_LOADOUTS, STORAGE_PRESETS, REGIONS, CLASSES, preset_key,
+    RUNE_TAB, AMMO_TAB, QUEST_TAB,
 )
 from core.save_file import guidify_dict, fix_max_slot_index
 
-# Protected tabs: Runes 32-55, Ammo 56-79, Quest 80-103 (verified layout,
-# matches core/inventory.py INVENTORY_TABS and the old tab_editor.py
-# RUNE_TAB/AMMO_TAB/QUEST_TAB precedence).
-_PROTECTED = [(32, 55), (56, 79), (80, 103)]
+# Protected tabs: Runes, Ammo, Quest (same ranges as core/inventory.py
+# INVENTORY_TABS and the templates in data/loadout_presets.py).
+_PROTECTED = [RUNE_TAB, AMMO_TAB, QUEST_TAB]
 
 
 def _is_protected(slot):

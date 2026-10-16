@@ -48,8 +48,8 @@ py -m nuitka --standalone --enable-plugin=tk-inter --include-package-data=custom
    --company-name="DragonWilds Ultra Editor" ^
    --product-name="DragonWilds Ultra Editor" ^
    --file-description="DragonWilds Ultra Save Editor" ^
-   --file-version=13.0.0.0 ^
-   --product-version=13.0.0.0 ^
+   --file-version=13.1.0.0 ^
+   --product-version=13.1.0.0 ^
    --assume-yes-for-downloads ^
    --msvc=latest ^
    --output-dir=dist --output-filename=DragonWildsUltraEditor.exe main.py

@@ -93,7 +93,7 @@ def test_reveal_map():
     unlocks.reveal_map(sf)
     fog = sf.progress["RevealedFog"]
     assert fog["RevealedRegionsBitmap"] == 4294967295
-    assert fog["RevealedRegionsDetectionActive"] is True
+    assert "RevealedRegionsDetectionActive" not in fog
     assert sf.dirty is True
 
 
@@ -109,6 +109,7 @@ def test_reset_status():
     ch = sf.progress["Character"]
     assert ch["Health"]["CurrentValue"] == 100
     assert ch["Stamina"]["CurrentValue"] == 100
+    assert ch["SpecialCharge"]["CurrentValue"] == 100
     assert ch["Sustenance"] == {"SustenanceValue": 100, "SustenanceDecayBuffer": 0}
     assert ch["Hydration"] == {"HydrationValue": 100, "HydrationDecayBuffer": 0}
     assert ch["Toxicity"] == {"ToxicityValue": 0, "HighestToxicityValue": 0}

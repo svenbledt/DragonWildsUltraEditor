@@ -10,7 +10,7 @@ from core.save_file import SaveFile, SaveError
 from ui.icons import app_root
 
 APP_TITLE = "DragonWilds Ultra Editor"
-APP_VERSION = "13.0"
+APP_VERSION = "13.1"
 
 # key -> (sidebar label, module path, class name); modules imported lazily so
 # the shell runs before all pages exist.
@@ -200,6 +200,15 @@ class App(ctk.CTk):
         self._update_header()
         self.show_page("overview")
         self.set_status("Loaded {}".format(os.path.basename(path)))
+        if self.save.is_outdated():
+            messagebox.showwarning(
+                "Older save format",
+                "This character was last saved by an older version of the "
+                "game (save format {}). The game rearranged the inventory "
+                "since then (bigger bag, new rune/ammo/quest slots).\n\n"
+                "Load this character in the game once and quit to the menu "
+                "before editing its inventory here, so the slots line up."
+                .format(self.save.version))
 
     def do_save(self):
         if not self.save:

@@ -20,12 +20,12 @@ def _any_item_id():
 
 def test_tabs_and_ranges():
     assert inv.INVENTORY_TABS == [
-        ("Bag", 0, 31), ("Runes", 32, 55), ("Ammo", 56, 79), ("Quest", 80, 103),
+        ("Bag", 0, 39), ("Runes", 40, 71), ("Ammo", 72, 103), ("Quest", 104, 175),
     ]
     assert inv.STORAGE_RANGE == (0, 19)
     assert inv.slot_bounds("storage") == (0, 19)
-    assert inv.slot_bounds("inventory", "Runes") == (32, 55)
-    assert inv.slot_bounds("inventory") == (0, 103)
+    assert inv.slot_bounds("inventory", "Runes") == (40, 71)
+    assert inv.slot_bounds("inventory") == (0, 175)
 
 
 def test_item_maps_memoized_and_populated():
@@ -63,7 +63,7 @@ def test_set_slot_validates():
     with pytest.raises(ValueError):
         inv.set_slot(sf, "storage", 20, iid, 1)      # out of storage range
     with pytest.raises(ValueError):
-        inv.set_slot(sf, "inventory", 104, iid, 1)   # out of inventory range
+        inv.set_slot(sf, "inventory", 176, iid, 1)   # out of inventory range
     with pytest.raises(ValueError):
         inv.set_slot(sf, "storage", 0, iid, 0)       # bad amount
     with pytest.raises(ValueError):
