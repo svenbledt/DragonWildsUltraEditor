@@ -130,6 +130,14 @@ _STORY_ORDER_OVERRIDES = {
         "SlayFuzan",               # journey through them to Fuzan
         "ReturnToIcthlarin",       # bring Fuzan's head — turn-in
     ],
+    # dump order is DefeatKuldra-first; story order from QF_SW_MainQuest
+    "Quest_SW_MainQuest": [
+        "AccessSW",                # set when the quest is given
+        "SpeakZilyana",            # after the gate opens
+        "ReturnToZilyana",         # set up a base on the island first
+        "DefeatKuldra",            # Zilyana takes you to Kuldra's lair
+        "BringHead",               # Kuldra's head to Zilyana — turn-in
+    ],
 }
 
 
@@ -142,10 +150,12 @@ for _q in EMBEDDED_QUESTS:
 
 
 # Main-story progression in expansion order: Bramblemead -> Fellhollow ->
-# Dowdun Reach -> Umbral Sands (Black Knight's Fortress "unlock[s] your way
-# through to the Umbral Sands" per its own quest description).
+# Dowdun Reach -> Umbral Sands -> Scorned Wilderness (Black Knight's Fortress
+# "unlock[s] your way through to the Umbral Sands" per its own quest
+# description; Regicide is the final fight against Kuldra).
 MAIN_QUEST_ORDER = ["Quest_DragonSlayer", "Quest_DeathQuestMain",
-                    "Quest_DR_MainQuest", "Quest_UmS_MainQuest"]
+                    "Quest_DR_MainQuest", "Quest_UmS_MainQuest",
+                    "Quest_SW_MainQuest"]
 
 
 def quests(category=None):

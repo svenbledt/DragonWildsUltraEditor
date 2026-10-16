@@ -1,7 +1,7 @@
 """Embedded quest snapshot, generated from the game files.
 
 Source: tools/icon_extractor --quests mode (CUE4Parse static pak read,
-Umbral Sands / 0.12). Regenerate: dotnet run -c Release -- --quests in
+Agility update). Regenerate: dotnet run -c Release -- --quests in
 tools/icon_extractor, then rebuild this file from quests_dump.json.
 
 quest_id matches GameProgress.QuestProgress.Quests[].QuestId in saves.
@@ -13,8 +13,8 @@ name; prefix MountDataAsset: when writing to MountsUnlockedList).
 EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
   'asset': 'Quest_DR_MainQuest',
   'name': "Black Knight's Fortress",
-  'description': 'Uncover the secrets of Dowdun Reach in order to unlock '
-                 'your way through to the Umbral Sands.',
+  'description': 'Uncover the secrets of Dowdun Reach in order to unlock your '
+                 'way through to the Umbral Sands.',
   'category': 'main',
   'region': None,
   'rewards': [{'item_id': 'PzF6r0v9aps3QVSoWKGy0A',
@@ -87,24 +87,22 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
                                                'Dreaming Stone around Dowdun '
                                                'Reach: 9/13',
                       'DR_Main_Objective_4_10': 'Collect the Shards of the '
-                                                'Dreaming Stone around '
-                                                'Dowdun Reach: 10/13',
+                                                'Dreaming Stone around Dowdun '
+                                                'Reach: 10/13',
                       'DR_Main_Objective_4_11': 'Collect the Shards of the '
-                                                'Dreaming Stone around '
-                                                'Dowdun Reach: 11/13',
+                                                'Dreaming Stone around Dowdun '
+                                                'Reach: 11/13',
                       'DR_Main_Objective_4_12': 'Collect the Shards of the '
-                                                'Dreaming Stone around '
-                                                'Dowdun Reach: 12/13',
-                      'DR_Main_Objective_4_13': 'Return to the Dreaming '
-                                                'Stone',
+                                                'Dreaming Stone around Dowdun '
+                                                'Reach: 12/13',
+                      'DR_Main_Objective_4_13': 'Return to the Dreaming Stone',
                       'DR_Main_Objective_4_-1': 'Speak to Doric about the '
-                                                'shards around Dowdun '
-                                                'Reach'}},
+                                                'shards around Dowdun Reach'}},
  {'quest_id': 'yrRZnkmro-IvH_OmZ3f-5A',
   'asset': 'Quest_DragonSlayer',
   'name': 'Dragon Slayer',
-  'description': 'Recruited with promises of glory, your first challenge is '
-                 'to defeat General Velgar.',
+  'description': 'Recruited with promises of glory, your first challenge is to '
+                 'defeat General Velgar.',
   'category': 'main',
   'region': None,
   'rewards': [{'item_id': '5MXdoES87BjPNAa2O22Qcg',
@@ -127,14 +125,12 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
                  'Challenge Velgar',
                  'Return to the Wise old man after killing velgar'],
   'objective_texts': {'Claim a bed': 'Construct a base of operations in '
-                                     'Bramblemead village. Build a shelter '
-                                     'and claim a bed.',
+                                     'Bramblemead village. Build a shelter and '
+                                     'claim a bed.',
                       'Return to the Wise old man after claimed bed': 'Speak '
-                                                                      'to '
-                                                                      'the '
+                                                                      'to the '
                                                                       'Wise '
-                                                                      'Old '
-                                                                      'Man '
+                                                                      'Old Man '
                                                                       'in '
                                                                       'Bramblemead '
                                                                       'village.',
@@ -147,9 +143,8 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
                                                     'blue-flame door in the '
                                                     'swamp. Find out what '
                                                     'Cathan is up to.',
-                      'Return to the Wise old man': 'Speak to the Wise Old '
-                                                    'Man in Bramblemead '
-                                                    'village.',
+                      'Return to the Wise old man': 'Speak to the Wise Old Man '
+                                                    'in Bramblemead village.',
                       'Venture into Ghornfell': 'Gear yourself up and push '
                                                 'forward into Ghornfell in '
                                                 'search of Cathan.',
@@ -158,11 +153,10 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
                                                                   'tower in '
                                                                   'search of '
                                                                   'Cathan.',
-                      'Craft the summon horn': 'Find the ingredients and '
-                                               'craft the Challenge Horn. '
-                                               'Check the recipe in your '
-                                               'journal for more '
-                                               'information.',
+                      'Craft the summon horn': 'Find the ingredients and craft '
+                                               'the Challenge Horn. Check the '
+                                               'recipe in your journal for '
+                                               'more information.',
                       'Challenge Velgar': 'Summon and defeat Velgar.',
                       'Return to the Wise old man after killing velgar': 'Bring '
                                                                          "Velgar's "
@@ -178,11 +172,15 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
  {'quest_id': 'kPtTW0exXrqw2BqELR_bFA',
   'asset': 'Quest_UmS_MainQuest',
   'name': "Icthlarin's Little Helper",
-  'description': 'Slay the tyrant dragon Fuzan and unite the Moon Garou '
-                 'along the way',
+  'description': 'Slay the tyrant dragon Fuzan and unite the Moon Garou along '
+                 'the way',
   'category': 'main',
   'region': None,
-  'rewards': [{'item_id': '-ScWrUBProaGeVmYdfrJAg',
+  'rewards': [{'item_id': 'myqnDkdJSshMLUq3sMlSLA',
+               'asset': 'RECIPE_Weapon_Shield_FuzanDragonfireShield',
+               'count': 1,
+               'type': 'recipe_unlock'},
+              {'item_id': '-ScWrUBProaGeVmYdfrJAg',
                'asset': 'ITEM_Consumable_Ums_MQ_RewardPack_Complete',
                'count': 1,
                'type': 'item'}],
@@ -206,52 +204,46 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
                  'FindLastKey'],
   'objective_texts': {'FindGarou': 'Speak to the Alcarrid Elder in the Moon '
                                    'Garou settlement to the south',
-                      'InvestigateGarouProblem': 'Investigate the nearby '
-                                                 'area for something that '
-                                                 'concerns the Moon Garou',
-                      'ReturnToFirstGarou': 'Return to Shangruuh, the '
-                                            'Alcarrid Envoy in the passage '
-                                            'from Dowdun Reach',
-                      'FindThreeKeys': 'Travel to Moon Garou camps, find '
-                                       'their elders, and earn their trust '
-                                       'to gain their Mirror Lenses',
+                      'InvestigateGarouProblem': 'Investigate the nearby area '
+                                                 'for something that concerns '
+                                                 'the Moon Garou',
+                      'ReturnToFirstGarou': 'Return to Shangruuh, the Alcarrid '
+                                            'Envoy in the passage from Dowdun '
+                                            'Reach',
+                      'FindThreeKeys': 'Travel to Moon Garou camps, find their '
+                                       'elders, and earn their trust to gain '
+                                       'their Mirror Lenses',
                       'FightFuzan': 'Enter the Fight Caves and defeat Fuzan',
-                      'ReturnToIcthlarin': "Bring Fuzan's head to Icthlarin "
-                                           'at the Mirror Relay',
-                      'FirstGarouEarnReputation.NoReputation': 'Gain the '
-                                                               'trust of the '
-                                                               'Alcarrid '
-                                                               'Camp',
+                      'ReturnToIcthlarin': "Bring Fuzan's head to Icthlarin at "
+                                           'the Mirror Relay',
+                      'FirstGarouEarnReputation.NoReputation': 'Gain the trust '
+                                                               'of the '
+                                                               'Alcarrid Camp',
                       'FirstGarouEarnReputation.LowReputation': 'Gain the '
-                                                                'trust of '
-                                                                'the '
-                                                                'Alcarrid '
-                                                                'Camp',
+                                                                'trust of the '
+                                                                'Alcarrid Camp',
                       'FirstGarouEarnReputation.MediumReputation': 'Gain the '
                                                                    'trust of '
                                                                    'the '
                                                                    'Alcarrid '
                                                                    'Camp',
                       'FirstGarouEarnReputation.HighReputation': 'Gain the '
-                                                                 'trust of '
-                                                                 'the '
+                                                                 'trust of the '
                                                                  'Alcarrid '
                                                                  'Camp',
                       'FirstGarouEarnReputation.MaxReputation': 'You have '
-                                                                'completed '
-                                                                "the tribe's "
-                                                                'tasks. '
-                                                                'Return to '
-                                                                'the '
+                                                                'completed the '
+                                                                "tribe's "
+                                                                'tasks. Return '
+                                                                'to the '
                                                                 'Alcarrid '
                                                                 'Elder',
                       'SpeakToIcthlarin': 'Speak to Icthlarin at the Mirror '
                                           'Relay',
                       'SpeakToGarouElder': 'Speak to the Alcarrid Elder and '
-                                           'complete tasks to earn their '
-                                           'trust',
-                      'RepairTheMirrors': 'Place the three Mirror Lenses '
-                                          'into the Mirror Relay',
+                                           'complete tasks to earn their trust',
+                      'RepairTheMirrors': 'Place the three Mirror Lenses into '
+                                          'the Mirror Relay',
                       'SlayFuzan': 'Journey through the Fight Caves and slay '
                                    'Fuzan',
                       'LookForLife': 'Look for signs of life in the desert',
@@ -261,8 +253,8 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
  {'quest_id': 'uftGB0es-CGrvXyPoxW31w',
   'asset': 'Quest_DeathQuestMain',
   'name': 'Withering Heights',
-  'description': 'Put an end to the horror of Fellhollow, by defeating '
-                 'Imaru, the soul-devourer.',
+  'description': 'Put an end to the horror of Fellhollow, by defeating Imaru, '
+                 'the soul-devourer.',
   'category': 'main',
   'region': None,
   'rewards': [{'item_id': 'V6JWS0Q-GuvrJS2f3-c_DA',
@@ -292,34 +284,32 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
   'objective_texts': {'TalkToWomNEGF': 'Speak to the Wise Old Man near '
                                        "Ashien's Watch.",
                       'UnlockGate': 'Unlock the strange door.',
-                      'SearchTheStructure': "Speak to the temple's "
-                                            'inhabitant.',
+                      'SearchTheStructure': "Speak to the temple's inhabitant.",
                       'SpeakToMysteriousFigure': 'Speak to Death.',
                       'SpeakToPostiePete': 'Speak to Postie Pete.',
                       'GoThroughDoorToFH': 'Enter Fellhollow.',
                       'FindACleansingPool': 'Remove the Soul Rift at a '
                                             'Purification Pool.',
-                      'InvestigateStandingStones': 'Find Cathan and look '
-                                                   'into what he was '
-                                                   'investigating.',
+                      'InvestigateStandingStones': 'Find Cathan and look into '
+                                                   'what he was investigating.',
                       'ReachedStandingStones': 'Get location of curse '
                                                'fragments 0/3.',
-                      'InteractedWithStone1': 'Get location of curse '
-                                              'fragments 1/3.',
-                      'InteractedWithStone2': 'Get location of curse '
-                                              'fragments 2/3.',
-                      'BreakTheThreeSeals': 'Gather three curse fragments '
-                                            'from the locations described in '
-                                            'the standing stones.',
+                      'InteractedWithStone1': 'Get location of curse fragments '
+                                              '1/3.',
+                      'InteractedWithStone2': 'Get location of curse fragments '
+                                              '2/3.',
+                      'BreakTheThreeSeals': 'Gather three curse fragments from '
+                                            'the locations described in the '
+                                            'standing stones.',
                       'BreakRemainingtwoSeals': 'Gather two more curse '
-                                                'fragments from the '
-                                                'locations described in the '
-                                                'standing stones.',
-                      'BreakTheFinalSeal': 'Find the last curse fragment '
-                                           'from the locations described in '
-                                           'the standing stones.',
-                      'ChallangeImaru': 'Enter the Shattered Spire and '
-                                        'defeat Imaru.',
+                                                'fragments from the locations '
+                                                'described in the standing '
+                                                'stones.',
+                      'BreakTheFinalSeal': 'Find the last curse fragment from '
+                                           'the locations described in the '
+                                           'standing stones.',
+                      'ChallangeImaru': 'Enter the Shattered Spire and defeat '
+                                        'Imaru.',
                       'ReturnToDeath': "Bring Imaru's head to Death."}},
  {'quest_id': '2V1KS0R3XJX-UtiuP78EoA',
   'asset': 'Quest_SaradominStatue',
@@ -353,8 +343,8 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
                'count': 1,
                'type': 'item'}],
   'objectives': ['Objective1', 'Objective2', 'Objective3'],
-  'objective_texts': {'Objective1': '[PH] Bring a Kalphite shell to Vannaka '
-                                    'to study',
+  'objective_texts': {'Objective1': '[PH] Bring a Kalphite shell to Vannaka to '
+                                    'study',
                       'Objective2': '[PH] Bring a Kalphite wing back to '
                                     'Vannaka for him to study',
                       'Objective3': '[PH] Bring some Kalphite ichor back to '
@@ -362,8 +352,8 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
  {'quest_id': 'O3ruOkgGHBqwIheSH_7BBg',
   'asset': 'Quest_AMelodyRemebered',
   'name': 'A Melody Remembered',
-  'description': 'A jewellery box in Ghornfell plays a haunting melody, but '
-                 'it cannot complete its song.',
+  'description': 'A jewellery box in Ghornfell plays a haunting melody, but it '
+                 'cannot complete its song.',
   'category': 'side',
   'region': None,
   'rewards': [{'item_id': 'UufnwENDSDFYKSG9v8yO8g',
@@ -382,8 +372,8 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
  {'quest_id': '4G_ph0XQeA1Nc72_CVO6HQ',
   'asset': 'Quest_ElderGarou',
   'name': 'A Room with a Garou',
-  'description': 'An elder garou wants you to build a home that his late '
-                 'wife would be proud of.',
+  'description': 'An elder garou wants you to build a home that his late wife '
+                 'would be proud of.',
   'category': 'side',
   'region': None,
   'rewards': [],
@@ -404,18 +394,17 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
                'count': 1,
                'type': 'item'}],
   'objectives': ['None', 'Objective2', 'Objective3', 'Objective4'],
-  'objective_texts': {'None': 'Read the Advert-Inna-Bottle next to '
-                              'Manktongue',
+  'objective_texts': {'None': 'Read the Advert-Inna-Bottle next to Manktongue',
                       'Objective2': 'Discuss the advert with Manktongue',
-                      'Objective3': 'Gather an undead chicken, magnetised '
-                                    'iron bar and undead twigs, and bring '
-                                    'them to Manktongue',
+                      'Objective3': 'Gather an undead chicken, magnetised iron '
+                                    'bar and undead twigs, and bring them to '
+                                    'Manktongue',
                       'Objective4': 'Return to Manktongue'}},
  {'quest_id': '0cB0D0QD_L4nrpu6CxZEsw',
   'asset': 'Quest_UmS_MainQuest1_TribeC_Task1',
   'name': 'Beast in the Sand',
-  'description': 'Follow the trail of the Dearg Due to the south, and '
-                 'retrieve the body of its victim. ',
+  'description': 'Follow the trail of the Dearg Due to the south, and retrieve '
+                 'the body of its victim. ',
   'category': 'side',
   'region': None,
   'rewards': [{'item_id': 'WqpIPU7dFtswfcaDoldlYg',
@@ -430,8 +419,8 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
  {'quest_id': '2kXJ3kWFS38kZfmPnvUFXw',
   'asset': 'Quest_SQ3_Nevermore',
   'name': 'Biohazard',
-  'description': 'Investigate the strange corruption afflicting the '
-                 'residents of Dowdun Reach.',
+  'description': 'Investigate the strange corruption afflicting the residents '
+                 'of Dowdun Reach.',
   'category': 'side',
   'region': None,
   'rewards': [{'item_id': '8L37OE7i2JOHvnKTu-_-xw',
@@ -448,18 +437,17 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
                  'DR_SQ3_LocateSource',
                  'DR_SQ3_FinalBeat'],
   'objective_texts': {'DR_SQ3_EntryPickup': 'Speak to Zanik about the '
-                                            'Corrupted Essence you got from '
-                                            'a strange raven.',
-                      'DR_SQ3_HuntRavens': 'Gather 10 biological samples '
-                                           'from strange ravens in Dowdun '
-                                           'Reach, and bring them to Zanik.',
-                      'DR_SQ3_FindIngredients': 'Bring Zanik the '
-                                                'ingredients. Dragons Blood. '
-                                                'A Twilight Lily and some '
-                                                'Unholy Water.',
-                      'DR_SQ3_LocateSource': 'Find the source of the '
-                                             'cthonian infection, somewhere '
-                                             'high up in Dowdun Reach.',
+                                            'Corrupted Essence you got from a '
+                                            'strange raven.',
+                      'DR_SQ3_HuntRavens': 'Gather 10 biological samples from '
+                                           'strange ravens in Dowdun Reach, '
+                                           'and bring them to Zanik.',
+                      'DR_SQ3_FindIngredients': 'Bring Zanik the ingredients. '
+                                                'Dragons Blood. A Twilight '
+                                                'Lily and some Unholy Water.',
+                      'DR_SQ3_LocateSource': 'Find the source of the cthonian '
+                                             'infection, somewhere high up in '
+                                             'Dowdun Reach.',
                       'DR_SQ3_FinalBeat': 'Return to Zanik and explain the '
                                           'situation.'}},
  {'quest_id': 'sQ91eUA55bcQx0OQ0m59sg',
@@ -491,15 +479,14 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
                                       'GAUNTLET OF FIRE - 1/4',
                       'Objective2.2': 'Touch 4 pedestals in any order in THE '
                                       'GAUNTLET OF FIRE - 2/4',
-                      'Objective3': 'Return to Zi in the Burning Spire '
-                                    'region of the Umbral Sands',
+                      'Objective3': 'Return to Zi in the Burning Spire region '
+                                    'of the Umbral Sands',
                       'Objective2.3': 'Touch 4 pedestals in any order in THE '
                                       'GAUNTLET OF FIRE - 3/4',
                       'Objective4': 'Use the password to enter the Cave of '
-                                    'Screams, within the Burning Spire '
-                                    'region',
-                      'Objective6': 'Return to the KotHaar Bouncer outside '
-                                    'of the Cave of Screams'}},
+                                    'Screams, within the Burning Spire region',
+                      'Objective6': 'Return to the KotHaar Bouncer outside of '
+                                    'the Cave of Screams'}},
  {'quest_id': 'A3DOkkGZxXUHc82rPKHznA',
   'asset': 'Quest_Contact',
   'name': 'Contact!',
@@ -507,10 +494,10 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
                  'Volcano',
   'category': 'side',
   'region': None,
-  'rewards': [{'item_id': 'a5rs9Ub7jmlX89io81drhw',
-               'asset': 'DA_Consumable_Vestige_Weapon_Staff_PharaohSceptre',
+  'rewards': [{'item_id': 'nPHTJky85bBWiI-YMJIatA',
+               'asset': 'RECIPE_Weapon_Staff_PharaohSceptre',
                'count': 1,
-               'type': 'item'}],
+               'type': 'recipe_unlock'}],
   'objectives': ['Objective1',
                  'Objective2',
                  'Objective4',
@@ -525,9 +512,8 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
                                     'Kalphite Hive',
                       'Objective2': 'Find 3 missing vault guardians and '
                                     'recover their Crystal Helix fragments',
-                      'Objective4': 'Use the Crystal Helix to pass through '
-                                    'the magical barrier in the Kalphite '
-                                    'Hive',
+                      'Objective4': 'Use the Crystal Helix to pass through the '
+                                    'magical barrier in the Kalphite Hive',
                       'Objective5': 'Talk to Zanik in the Shortcut Chamber '
                                     'within the Kalphite Hive',
                       'Objective2.1': 'Follow the footsteps in the sand to '
@@ -560,8 +546,7 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
                       'Objective2': 'Bake a cake using the stove next to '
                                     'Slopfinger.',
                       'Objective3': 'Bring the signed cake to Manktongue.',
-                      'Objective4': 'Show Slopfinger the freshly cooked '
-                                    'cake.',
+                      'Objective4': 'Show Slopfinger the freshly cooked cake.',
                       'Objective5': 'Give Slopfinger the good news.'}},
  {'quest_id': 'Kdj6N0dEw05JjoyDP0pNvw',
   'asset': 'Quest_DogDays',
@@ -580,14 +565,13 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
                  'Objective5',
                  'Objective6'],
   'objective_texts': {'Objective1': 'Search Garou camps beneath giant wyrm '
-                                    'bones in the Highlands for information '
-                                    'on Garou ritual practices.',
-                      'Objective2': 'Challenge a Garou king in their '
-                                    'Highland stronghold and claim their '
-                                    'token.',
-                      'Objective3': 'Search garou camps beneath the giant '
-                                    'wyrm bones in the Highlands for '
-                                    "information on the King's Token.",
+                                    'bones in the Highlands for information on '
+                                    'Garou ritual practices.',
+                      'Objective2': 'Challenge a Garou king in their Highland '
+                                    'stronghold and claim their token.',
+                      'Objective3': 'Search garou camps beneath the giant wyrm '
+                                    'bones in the Highlands for information on '
+                                    "the King's Token.",
                       'Objective4': 'Complete the ritual of purification on '
                                     "the King's Token at the ancient shrine "
                                     'where "a heart once beat".',
@@ -609,17 +593,15 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
                  'SpeakToDoric'],
   'objective_texts': {'FindSkeletonShortbow': "Craft an Undead Ranger's Bow "
                                               'and bring it to Doric in '
-                                              'Fellhollow. Doric believes '
-                                              'the recipe is in a vault '
-                                              'somewhere.',
-                      'FindShadowSword': 'Craft a Shadow Sword and bring it '
-                                         'to Doric in Fellhollow. Doric '
-                                         'believes a zogre has the recipe.',
-                      'FindNecromancerStaff': "Craft a Necromancer's Staff "
-                                              'and bring it to Doric in '
-                                              'Fellhollow. Doric believes '
-                                              'the recipe is in a vault '
-                                              'somewhere.',
+                                              'Fellhollow. Doric believes the '
+                                              'recipe is in a vault somewhere.',
+                      'FindShadowSword': 'Craft a Shadow Sword and bring it to '
+                                         'Doric in Fellhollow. Doric believes '
+                                         'a zogre has the recipe.',
+                      'FindNecromancerStaff': "Craft a Necromancer's Staff and "
+                                              'bring it to Doric in '
+                                              'Fellhollow. Doric believes the '
+                                              'recipe is in a vault somewhere.',
                       'SpeakToDoric': 'Speak to Doric in Fellhollow.'}},
  {'quest_id': '4QQuNkR6spTCXC6zj6VqxQ',
   'asset': 'Quest_FH_GhostQuest',
@@ -652,8 +634,8 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
                       'FindGhosts2/3': 'Find ghosts and complete their '
                                        'unfinished business. (2/3)',
                       'BackToZanik': 'Return to Zanik.',
-                      'BackToZanikNotSpokenToZanik': 'Tell someone about '
-                                                     'these spirits. '}},
+                      'BackToZanikNotSpokenToZanik': 'Tell someone about these '
+                                                     'spirits. '}},
  {'quest_id': 'AsyEt0xjewNEzYmzr_kg_w',
   'asset': 'Quest_GoblinDiplomacy',
   'name': 'Goblin Diplomacy',
@@ -673,16 +655,15 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
                  'Objective6'],
   'objective_texts': {'Objective1': 'Investigate the ruins to the northeast '
                                     'and the guild to the south of Zanik.',
-                      'Objective2a': 'Investigate the ruin northeast of '
-                                     'Zanik.',
+                      'Objective2a': 'Investigate the ruin northeast of Zanik.',
                       'Objective2b': 'Investigate the guild south of Zanik.',
                       'Objective3': 'Search for the other amulet piece in an '
                                     'area filled with mud and stagnant '
                                     'swampwater.',
                       'Objective4': 'Bring both amulets to Zanik.',
                       'Objective5': 'Look for the other amulet at either the '
-                                    'ruins northeast of Zanik, or the guild '
-                                    'to the south.',
+                                    'ruins northeast of Zanik, or the guild to '
+                                    'the south.',
                       'Objective6': 'Find someone that can identify the '
                                     'Bandosian amulet.'}},
  {'quest_id': 'bsfNlkgT8D_Y5HCdCf-Seg',
@@ -714,10 +695,10 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
   'objectives': ['Objective1', 'Objective2', 'Objective3'],
   'objective_texts': {'Objective1': 'Investigate the secrets hidden below '
                                     "Ashien's Watch.",
-                      'Objective2': "Find someone near Ashien's Watch that "
-                                    'can translate ancient dwarvish. ',
-                      'Objective3': 'Bring the blueprint to Doric in '
-                                    "Ashien's Watch."}},
+                      'Objective2': "Find someone near Ashien's Watch that can "
+                                    'translate ancient dwarvish. ',
+                      'Objective3': "Bring the blueprint to Doric in Ashien's "
+                                    'Watch.'}},
  {'quest_id': 'xsgOzUS-M2iCLDe-XTDq3w',
   'asset': 'Quest_Heartstrings',
   'name': 'Heartstrings',
@@ -756,10 +737,9 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
                  'Charge the orb',
                  'Return to statue'],
   'objective_texts': {'Investigate for clues about the statue': 'Investigate '
-                                                                'the area '
-                                                                'for clues '
-                                                                'about the '
-                                                                'statue.',
+                                                                'the area for '
+                                                                'clues about '
+                                                                'the statue.',
                       'Search the runecrafting guild for wizard statue': 'Search '
                                                                          'the '
                                                                          'Runecrafting '
@@ -767,8 +747,8 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
                                                                          'for '
                                                                          'a '
                                                                          'statue.',
-                      'Charge the orb': 'Find a way to charge the  '
-                                        'mysterious orb.',
+                      'Charge the orb': 'Find a way to charge the  mysterious '
+                                        'orb.',
                       'Return to statue': 'Return to the wizard statue.'}},
  {'quest_id': '4kbEAUJrs6mebhGkzFQxmA',
   'asset': 'Quest_FH_LettersForTheDead',
@@ -790,9 +770,9 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
                       'ObjectiveThree': 'Find and deliver letters for Postie '
                                         'Pete. 2/3',
                       'ObjectiveReturn': 'Return to Postie Pete.',
-                      'ObjectiveZero': 'Visit Postie Pete near the entrance '
-                                       'to Fellhollow to begin searching for '
-                                       'lost letters.'}},
+                      'ObjectiveZero': 'Visit Postie Pete near the entrance to '
+                                       'Fellhollow to begin searching for lost '
+                                       'letters.'}},
  {'quest_id': 'NjeUO0TBeyQGzSCmu2b3bA',
   'asset': 'Quest_UMS_MappingTheSands',
   'name': 'Mapping the Sands I',
@@ -809,24 +789,23 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
                'count': 1,
                'type': 'item'}],
   'objectives': ['Objective1', 'Objective2', '0/3', '1/3', '2/3', '3/3'],
-  'objective_texts': {'Objective1': 'Climb tall locations around the '
-                                    'Alcarrid Camp and find their Moon '
-                                    'Sprites',
+  'objective_texts': {'Objective1': 'Climb tall locations around the Alcarrid '
+                                    'Camp and find their Moon Sprites',
                       'Objective2': 'Return to the Moon Sprite Shaman in the '
                                     'Alcarrid Camp',
-                      '0/3': 'Climb tall locations near Alcarrid Camp and '
-                             'find their Moon Sprites (0/3)',
-                      '1/3': 'Climb tall locations near Alcarrid Camp and '
-                             'find their Moon Sprites (1/3)',
-                      '2/3': 'Climb tall locations near Alcarrid Camp and '
-                             'find their Moon Sprites (2/3)',
-                      '3/3': 'Climb tall locations near Alcarrid Camp and '
-                             'find their Moon Sprites (3/3)'}},
+                      '0/3': 'Climb tall locations near Alcarrid Camp and find '
+                             'their Moon Sprites (0/3)',
+                      '1/3': 'Climb tall locations near Alcarrid Camp and find '
+                             'their Moon Sprites (1/3)',
+                      '2/3': 'Climb tall locations near Alcarrid Camp and find '
+                             'their Moon Sprites (2/3)',
+                      '3/3': 'Climb tall locations near Alcarrid Camp and find '
+                             'their Moon Sprites (3/3)'}},
  {'quest_id': 'rI4VkUT_8837ayKcLgxWwQ',
   'asset': 'Quest_UMS_MappingTheSands2',
   'name': 'Mapping the Sands II',
-  'description': 'Discover Moon Sprites on top of tall locations around all '
-                 'of the Umbral Sands.',
+  'description': 'Discover Moon Sprites on top of tall locations around all of '
+                 'the Umbral Sands.',
   'category': 'side',
   'region': None,
   'rewards': [{'item_id': 'FQJHiEXl-tOLqY6GZ4Reww',
@@ -843,8 +822,8 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
                  '5/8',
                  '6/8',
                  '7/8'],
-  'objective_texts': {'Objective1': 'Climb tall locations around Umbral '
-                                    'Sands and find their Moon Sprites',
+  'objective_texts': {'Objective1': 'Climb tall locations around Umbral Sands '
+                                    'and find their Moon Sprites',
                       'Objective2': 'Return to the Moon Sprite Shaman in the '
                                     'Alcarrid Camp',
                       '0/8': 'Climb tall locations around Umbral Sands and '
@@ -884,8 +863,8 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
                                          'abandon the Mark Day Festival. 1/3',
                       'ConvinceNoble.2': 'Convince the Uzzer councillors to '
                                          'abandon the Mark Day Festival. 2/3',
-                      'ReturnToShangruuh': 'Return to Shangruuh - Garou '
-                                           'Envoy in the Uzzer Camp'}},
+                      'ReturnToShangruuh': 'Return to Shangruuh - Garou Envoy '
+                                           'in the Uzzer Camp'}},
  {'quest_id': 'KLBpt02O2AA_kaa_A8Av9w',
   'asset': 'Quest_FH_MirrorMirror',
   'name': 'Mirror Mirror',
@@ -934,8 +913,8 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
   'objective_texts': {'Found ghost amulet': 'Search for a purpose for the '
                                             'Amulet of Ghostspeak.',
                       'Put ghosts to rest': 'Find the restless spirits and '
-                                            'help lay them to rest. They '
-                                            'only appear at night. '}},
+                                            'help lay them to rest. They only '
+                                            'appear at night. '}},
  {'quest_id': 'd6s4dUyoCduLy7eRc2KndQ',
   'asset': 'Quest_UmS_MainQuest1_TribeA_Task2',
   'name': 'Rogue Trader',
@@ -951,12 +930,12 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
   'objective_texts': {'FindMoonstone': 'Find 3 moonstones beneath gypsum '
                                        'deposits in rocky areas west of '
                                        'Alcarrid',
-                      'ReturnToShopkeeper': 'Return to Domri - The Merchant '
-                                            'in the Alcarrid Camp'}},
+                      'ReturnToShopkeeper': 'Return to Domri - The Merchant in '
+                                            'the Alcarrid Camp'}},
  {'quest_id': 'XElCtUmXXqK35p63tua9og',
   'asset': 'Quest_UmS_MainQuest1_TribeB_Task1',
   'name': 'Saga of the Adventurer',
-  'description': 'Help Laguna - The Bard to find statues in rocky spires '
+  'description': 'Help Laguna - The Bard to find stone slabs in rocky spires '
                  'around the pyramid',
   'category': 'side',
   'region': None,
@@ -970,34 +949,36 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
                  'FindRemainingClues3/4',
                  'LocateTheGateway',
                  'ReturnToBard'],
-  'objective_texts': {'FindTheClues': 'Use your Saga to find clues towards '
-                                      'the treasure',
-                      'None': 'Continue to find statues. Your Saga has been '
-                              'updated!',
-                      'FindRemainingClues2/4': 'Continue to find statues. '
+  'objective_texts': {'FindTheClues': 'Use your Saga to find clues towards the '
+                                      'treasure',
+                      'None': 'Continue to find stone slabs. Your Saga has '
+                              'been updated!',
+                      'FindRemainingClues2/4': 'Continue to find stone slabs. '
                                                'Your Saga has been updated!',
-                      'FindRemainingClues3/4': 'Continue to find statues. '
+                      'FindRemainingClues3/4': 'Continue to find stone slabs. '
                                                'Your Saga has been updated!',
                       'LocateTheGateway': 'Follow the final clue to the last '
-                                          'statue. Your Saga has been '
+                                          'stone slab. Your Saga has been '
                                           'updated! ',
                       'ReturnToBard': 'Return to Laguna - The Bard'}},
  {'quest_id': 'Bnon4kzm_EdvZz-bma5HBg',
   'asset': 'Quest_UmS_MainQuest1_TribeC_Task2',
   'name': 'Scaling Difficulties',
-  'description': 'Find some lost garou scouts and slay the creature they '
-                 'have been tracking',
+  'description': 'Find some lost garou scouts and slay the creature they have '
+                 'been tracking',
   'category': 'side',
   'region': None,
   'rewards': [{'item_id': 'WqpIPU7dFtswfcaDoldlYg',
                'asset': 'ITEM_Resources_Currency_Chit_Garou',
                'count': 200,
                'type': 'item'}],
-  'objectives': ['FindDragon', 'SearchLocation'],
+  'objectives': ['FindDragon', 'SearchLocation', 'ReturnToGarou'],
   'objective_texts': {'FindDragon': 'Locate the dragon to the east and bring '
                                     'its heart back to Hedric - The Hunter',
                       'SearchLocation': 'Search the village to the east for '
-                                        'signs of the lost scouts'}},
+                                        'signs of the lost scouts',
+                      'ReturnToGarou': 'Return the dragon heart to Hedric - '
+                                       'The Hunter'}},
  {'quest_id': 'kTD_70L2tJmsOiSW5iCYVw',
   'asset': 'Quest_ScarecrowScavenging',
   'name': 'Scarecrow Scavenging',
@@ -1038,8 +1019,8 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
  {'quest_id': 'Xb1KUkU_wOIHvzahULr6yA',
   'asset': 'Quest_UmS_MainQuest1_TribeC_Task3',
   'name': 'Song of the Ancients',
-  'description': "Complete the lost 'Song of the Ancients' by finding lyrics "
-                 'within the Dragonkin Vault.',
+  'description': "Complete the 'Song of the Ancients' by finding lyrics on "
+                 'stone slabs within the Dragonkin Vault.',
   'category': 'side',
   'region': None,
   'rewards': [],
@@ -1049,12 +1030,12 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
                  'FindStatues.3',
                  'FindStatues.4',
                  'Return'],
-  'objective_texts': {'FindStatues.0': 'Transcribe lyrics written on statues '
-                                       'within the Dragonkin Vault. 0/3',
-                      'FindStatues.1': 'Transcribe lyrics written on statues '
-                                       'within the Dragonkin Vault. 1/3',
-                      'FindStatues.2': 'Transcribe lyrics written on statues '
-                                       'within the Dragonkin Vault. 2/3',
+  'objective_texts': {'FindStatues.0': 'Transcribe lyrics written on stone '
+                                       'slabs within the Dragonkin Vault. 0/3',
+                      'FindStatues.1': 'Transcribe lyrics written on stone '
+                                       'slabs within the Dragonkin Vault. 1/3',
+                      'FindStatues.2': 'Transcribe lyrics written on stone '
+                                       'slabs within the Dragonkin Vault. 2/3',
                       'FindStatues.3': None,
                       'FindStatues.4': None,
                       'Return': 'Return to Laguna - The Bard in the Manafem '
@@ -1088,8 +1069,7 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
  {'quest_id': 'db-ciknQnYrkNHuOcQXhkA',
   'asset': 'Quest_GreatBodyRobbery',
   'name': 'The Great Body Robbery',
-  'description': 'Assist Dr Fenkenstrain in acquiring a new body. FOR '
-                 'SCIENCE!',
+  'description': 'Assist Dr Fenkenstrain in acquiring a new body. FOR SCIENCE!',
   'category': 'side',
   'region': None,
   'rewards': [{'item_id': '-fbjZE8aCAERg0-TuBMRcg',
@@ -1114,30 +1094,30 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
                  'BodyParts.2',
                  'AddPartsToTable'],
   'objective_texts': {'BodyParts.0': 'Dig up body parts from graves around '
-                                     'the Bloodblight Swamps. 0/3',
+                                     'Bloodblight Swamp. 0/3',
                       'Objective2': 'Speak to Fenkenstrain',
                       'Objective3': 'Speak to Fenkenstrain',
-                      'Objective4': 'Bring Dr Fenkenstrain: 1 Weak '
-                                    'Antipoison, 1 Weak Focused Attack '
-                                    'Potion and 1 Weak Lumberjack Potion.',
+                      'Objective4': 'Bring Dr Fenkenstrain: 1 Weak Antipoison, '
+                                    '1 Weak Focused Attack Potion and 1 Weak '
+                                    'Lumberjack Potion.',
                       'Objective5': 'Collect lightning in a bottle and bring '
                                     'it to Dr Fenkenstrain.',
                       'Objecrive3.5': 'Perform an autopsy of the body on the '
                                       'examination table in Doctor '
                                       "Fenkenstrain's tower. ",
                       'Objective6': 'Speak to Fenkenstrain',
-                      'Objective7': "Put Doctor Fenkenstrain's head on his "
-                                    'new body on the examination table. ',
+                      'Objective7': "Put Doctor Fenkenstrain's head on his new "
+                                    'body on the examination table. ',
                       'Objective8': 'Put the Lightning-in-a-bottle into the '
                                     "machine in Doctor Fenkenstrain's lab. ",
                       'Objective9': 'Speak to Fenkenstrain',
                       'BodyParts.1': 'Dig up body parts from graves around '
-                                     'the Bloodblight Swamps. 1/3',
+                                     'Bloodblight Swamp. 1/3',
                       'BodyParts.2': 'Dig up body parts from graves around '
-                                     'the Bloodblight Swamps. 2/3',
+                                     'Bloodblight Swamp. 2/3',
                       'AddPartsToTable': 'Place the body parts on the '
-                                         'examination table in '
-                                         "Fenkenstrain's tower."}},
+                                         "examination table in Fenkenstrain's "
+                                         'tower.'}},
  {'quest_id': 'd6M5Dkpx9Pjw_V2mNJh6eA',
   'asset': 'Quest_UmS_MainQuest1_TribeA_Task3',
   'name': "The Mirror Crack'd",
@@ -1162,13 +1142,13 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
                'count': 1,
                'type': 'mount_unlock'}],
   'objectives': ['HuntBeast', 'BringHeart', 'BringHeartNotStarted'],
-  'objective_texts': {'HuntBeast': 'Hunt down Nature Spirits near '
-                                   "Fellhollow's willow groves and bring "
-                                   'three of their hearts to Vannaka. ',
+  'objective_texts': {'HuntBeast': "Hunt down Nature Spirits near Fellhollow's "
+                                   'willow groves and bring three of their '
+                                   'hearts to Vannaka. ',
                       'BringHeart': 'Bring the hearts to Vannaka. ',
                       'BringHeartNotStarted': 'Bring the Primordial Heart to '
-                                              'someone with an interest in '
-                                              'the wild hunt. '}},
+                                              'someone with an interest in the '
+                                              'wild hunt. '}},
  {'quest_id': 'wwEK50EPipTecO20yTquSQ',
   'asset': 'Quest_FH_NightoftheSpectralBoom',
   'name': 'Things That Go Boom In The Night',
@@ -1235,11 +1215,10 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
                  'FindScrollsAndReturn',
                  'ObjectiveZero'],
   'objective_texts': {'FindBooks': 'Find five of Abraxus’ missing books in '
-                                   'eastern Fellhollow and return them to '
-                                   'him.',
+                                   'eastern Fellhollow and return them to him.',
                       'FoundBooks': 'Bring the books to Abraxus.',
-                      'FindScrolls': "Defeat Abraxus' enemies to retrieve "
-                                     'the scrolls.',
+                      'FindScrolls': "Defeat Abraxus' enemies to retrieve the "
+                                     'scrolls.',
                       'FoundScrolls': 'Bring the scrolls to Abraxus.',
                       'FindBooksAndReturn': 'Find five of Abraxus’ missing '
                                             'books in eastern Fellhollow and '
@@ -1266,11 +1245,11 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
                  'DR_SQ1_ReturnToDoric'],
   'objective_texts': {'DR_SQ1_Temple': 'Look for signs of the mugger-mage in '
                                        'the Cathedral in Dowdun Keep.',
-                      'DR_SQ1_Garrison': 'Look for signs of the mugger-mage '
-                                         'in the Garrisons of Dowdun Keep.',
-                      'DR_SQ1_Aquifer': 'Look for signs of the mugger-mage '
-                                        'in the underground Demon Gate of '
-                                        'Dowdun Keep.',
+                      'DR_SQ1_Garrison': 'Look for signs of the mugger-mage in '
+                                         'the Garrisons of Dowdun Keep.',
+                      'DR_SQ1_Aquifer': 'Look for signs of the mugger-mage in '
+                                        'the underground Demon Gate of Dowdun '
+                                        'Keep.',
                       'DR_SQ1_ReturnToDoric': 'Speak to Doric in the Dowdun '
                                               'Reach Nexus.'}},
  {'quest_id': 'xmM520wY0W5Qw8qE3YnC5Q',
@@ -1296,8 +1275,8 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
                'count': 1,
                'type': 'item'}],
   'objectives': ['Objective1'],
-  'objective_texts': {'Objective1': 'Speak to the Wise Old Man in '
-                                    'Bramblemead village.'}},
+  'objective_texts': {'Objective1': 'Speak to the Wise Old Man in Bramblemead '
+                                    'village.'}},
  {'quest_id': 'AmuXOUitB08PYDCmdVA_Ug',
   'asset': 'Quest_FTUE_GS',
   'name': 'First Steps',
@@ -1306,10 +1285,8 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
   'region': None,
   'rewards': [],
   'objectives': ['Objective1', 'Objective2', 'Objective3'],
-  'objective_texts': {'Objective1': 'Speak to the Wise Old Man in the '
-                                    'Temple.',
-                      'Objective2': 'Speak to the Wise Old Man in the '
-                                    'Temple.',
+  'objective_texts': {'Objective1': 'Speak to the Wise Old Man in the Temple.',
+                      'Objective2': 'Speak to the Wise Old Man in the Temple.',
                       'Objective3': 'Speak to Doric outside the Temple.'}},
  {'quest_id': 'v9LCTEjS-igQFrq4bpvtsA',
   'asset': 'Quest_FTUE_Q1',
@@ -1319,10 +1296,8 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
   'region': None,
   'rewards': [],
   'objectives': ['Objective1', 'Objective2', 'Objective3'],
-  'objective_texts': {'Objective1': 'Speak to the Wise Old Man in the '
-                                    'Temple.',
-                      'Objective2': 'Speak to the Wise Old Man in the '
-                                    'Temple.',
+  'objective_texts': {'Objective1': 'Speak to the Wise Old Man in the Temple.',
+                      'Objective2': 'Speak to the Wise Old Man in the Temple.',
                       'Objective3': 'Speak to Doric outside the Temple.'}},
  {'quest_id': '7i8X403LNgw6uY-XK5OgnA',
   'asset': 'Quest_FTUE_Q7',
@@ -1345,13 +1320,12 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
                'count': 1,
                'type': 'item'}],
   'objectives': ['Objective1', 'Objective2', 'Objective3'],
-  'objective_texts': {'Objective1': 'Collect some dirty water from the '
-                                    'nearby ponds and bring them back to '
-                                    'Doric.',
-                      'Objective2': 'Build a crafting table and craft a '
-                                    'stone club, then bring it to Doric.',
-                      'Objective3': 'Bring the stone club to Doric outside '
-                                    'the temple.'}},
+  'objective_texts': {'Objective1': 'Collect some dirty water from the nearby '
+                                    'ponds and bring them back to Doric.',
+                      'Objective2': 'Build a crafting table and craft a stone '
+                                    'club, then bring it to Doric.',
+                      'Objective3': 'Bring the stone club to Doric outside the '
+                                    'temple.'}},
  {'quest_id': '_L6IAEaHSVPnhhaTamBHBA',
   'asset': 'Quest_FTUE_Farming',
   'name': 'Growing Pains',
@@ -1375,24 +1349,22 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
                  'FinishQuest',
                  'HarvestCrop'],
   'objective_texts': {'SpeakToWOM1': 'Speak to the Wise Old Man, in '
-                                     'Bramblemead, to learn about the '
-                                     'Farming skill. ',
+                                     'Bramblemead, to learn about the Farming '
+                                     'skill. ',
                       'BuildGardenPlot': '[TEMP] Build a Garden Plot',
                       'PlantSeeds': '[TEMP] Plant Wheat Seeds',
                       'SpeakToWOM2': '[TEMP] Speak to the Wise Old Man to '
                                      'learn about watering and harvesting',
                       'FullyWaterPlot': '[TEMP] Fully water a Gardening Plot',
-                      'HarvestPlot': '[TEMP] Harvest Wheat at a Gardening '
-                                     'Plot',
+                      'HarvestPlot': '[TEMP] Harvest Wheat at a Gardening Plot',
                       'SpeakToWOM3': '[TEMP] Return to the Wise Old Man',
-                      'GetCompost': '[TEMP] Obtain compost from a compost '
-                                    'bin',
+                      'GetCompost': '[TEMP] Obtain compost from a compost bin',
                       'ApplyCompostToPlot': '[TEMP] Fully treat Garden Plot '
                                             'with compost',
                       'FinishQuest': 'Return to the Wise Old Man in '
                                      'Bramblemead.',
-                      'HarvestCrop': 'Grow and harvest your first crop from '
-                                     'a farming plot. '}},
+                      'HarvestCrop': 'Grow and harvest your first crop from a '
+                                     'farming plot. '}},
  {'quest_id': '4lW6rU0i0js1e3qFEAVI4w',
   'asset': 'Quest_FTUE_Q5',
   'name': 'Ratcatcher',
@@ -1441,8 +1413,8 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
                'count': 25,
                'type': 'item'}],
   'objectives': ['Objective2', 'Objective3'],
-  'objective_texts': {'Objective2': 'Craft a stone logging axe at a '
-                                    'workbench and show it to Doric. ',
+  'objective_texts': {'Objective2': 'Craft a stone logging axe at a workbench '
+                                    'and show it to Doric. ',
                       'Objective3': 'Return to Doric and show him the stone '
                                     'logging axe. '}},
  {'quest_id': 'TgVnb0NCLvmEVRed59IgsQ',
@@ -1467,10 +1439,9 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
   'region': None,
   'rewards': [],
   'objectives': ['Objective1', 'Objective2', 'Objective3'],
-  'objective_texts': {'Objective1': 'Speak to the Wise Old Man in the '
-                                    'temple.',
-                      'Objective2': 'Mine rune essence, build a rune altar '
-                                    'and craft some air runes.',
+  'objective_texts': {'Objective1': 'Speak to the Wise Old Man in the temple.',
+                      'Objective2': 'Mine rune essence, build a rune altar and '
+                                    'craft some air runes.',
                       'Objective3': 'Speak to the Wise Old Man in the '
                                     'temple.'}},
  {'quest_id': 'zrqqFUNmx3lcF6umysJfvQ',
@@ -1495,8 +1466,8 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
   'objective_texts': {'Objective1': 'Speak to Zanik near the river, down the '
                                     'road from the temple.',
                       'Objective2': 'Mine Rune Essence, craft some Air and '
-                                    'Astral Runes by building a Rune Altar '
-                                    'or from Siphoning Anima Vents.',
+                                    'Astral Runes by building a Rune Altar or '
+                                    'from Siphoning Anima Vents.',
                       'Objective3': 'Return to Zanik.'}},
  {'quest_id': '_8zxGkuJtgJeZgG_lEGXuw',
   'asset': 'Quest_FTUE_Q3',
@@ -1512,8 +1483,8 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
  {'quest_id': '8gKiWUPU3vW2sQesVHdrPA',
   'asset': 'Quest_DR_FTUE_Fishing',
   'name': 'Shrimp Catcher',
-  'description': 'The Wise Old Man has some tips on how to grow as an '
-                 'amateur angler. ',
+  'description': 'The Wise Old Man has some tips on how to grow as an amateur '
+                 'angler. ',
   'category': 'tutorial',
   'region': None,
   'rewards': [{'item_id': 'QwGXZE4nIZWUh2qSPgUq6g',
@@ -1529,23 +1500,50 @@ EMBEDDED_QUESTS = [{'quest_id': '3MpWS0mD8A6yFVmjVAA2Qg',
                'count': 3,
                'type': 'item'}],
   'objectives': ['SpeakToWom', 'StartFishing', 'ReturnToTheWOM'],
-  'objective_texts': {'SpeakToWom': 'Speak to the Wise Old Man to learn '
-                                    'about Fishing.',
+  'objective_texts': {'SpeakToWom': 'Speak to the Wise Old Man in Bramblemead '
+                                    'Village to learn about Fishing.',
                       'StartFishing': 'Fish a Sardine at a fishing spot near '
-                                      'the Wise Old Man.',
-                      'ReturnToTheWOM': 'Return to the Wise Old Man.'}},
+                                      'the Wise Old Man in Bramblemead '
+                                      'Village.',
+                      'ReturnToTheWOM': 'Return to the Wise Old Man in '
+                                        'Bramblemead Village.'}},
  {'quest_id': 'DSGuYE-gPNCI1yCzvZhT8Q',
   'asset': 'Quest_FTUE_WardStones',
   'name': 'Warding Off Danger',
-  'description': 'The Wise Old Man wants to teach you about Lifewards and '
-                 'how to recharge them.',
+  'description': 'The Wise Old Man wants to teach you about Lifewards and how '
+                 'to recharge them.',
   'category': 'tutorial',
   'region': None,
   'rewards': [],
   'objectives': ['Objective1', 'Objective2', 'Objective3'],
-  'objective_texts': {'Objective1': 'Speak to the Wise Old Man to learn '
-                                    'about Lifewards.',
+  'objective_texts': {'Objective1': 'Speak to the Wise Old Man to learn about '
+                                    'Lifewards.',
                       'Objective2': 'Craft a Small Wardstone at a Crafting '
                                     'Table and bring it to the Wise Old Man.',
                       'Objective3': 'Bring your Small Wardstone to the Wise '
-                                    'Old Man.'}}]
+                                    'Old Man.'}},
+ {'quest_id': 'Nw3wiUaB8siRIN2bStWJmw',
+  'asset': 'Quest_SW_MainQuest',
+  'name': 'Regicide',
+  'description': 'Take the fight to Kuldra, and end this once and for all. ',
+  'category': 'main',
+  'region': None,
+  'rewards': [{'item_id': 'yPxVHUt4c8xZInC2YuTobg',
+               'asset': 'RECIPE_Armour_T8_Cape_Dragonslayer',
+               'count': 1,
+               'type': 'recipe_unlock'},
+              {'item_id': 'NfsDG0_3S4YQdcCD8_PjKA',
+               'asset': 'ITEM_Consumable_KuldraPack_Unique',
+               'count': 1,
+               'type': 'item'}],
+  'objectives': ['DefeatKuldra',
+                 'BringHead',
+                 'AccessSW',
+                 'SpeakZilyana',
+                 'ReturnToZilyana'],
+  'objective_texts': {'DefeatKuldra': 'Defeat Kuldra',
+                      'BringHead': "Bring Kuldra's head to Zilyana. ",
+                      'AccessSW': 'Gain access to the Scorned Wilderness. ',
+                      'SpeakZilyana': 'Speak to Zilyana. ',
+                      'ReturnToZilyana': 'Once you are fully prepared, speak '
+                                         'to Zilyana. '}}]

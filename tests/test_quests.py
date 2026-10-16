@@ -17,7 +17,7 @@ def _sf():
 # ---- embedded data integrity -------------------------------------------
 
 def test_embedded_quests_complete_and_unique():
-    assert len(EMBEDDED_QUESTS) == 58
+    assert len(EMBEDDED_QUESTS) == 59
     ids = [q["quest_id"] for q in EMBEDDED_QUESTS]
     assert len(set(ids)) == len(ids)
     assert all(q["name"] for q in EMBEDDED_QUESTS)
@@ -210,7 +210,13 @@ def test_ready_on_objectiveless_quest_is_plain_in_progress():
 def test_main_quests_listed_in_story_order():
     assert [q["asset"] for q in quests.quests("main")] == [
         "Quest_DragonSlayer", "Quest_DeathQuestMain",
-        "Quest_DR_MainQuest", "Quest_UmS_MainQuest"]
+        "Quest_DR_MainQuest", "Quest_UmS_MainQuest", "Quest_SW_MainQuest"]
+
+
+def test_regicide_objectives_in_story_order():
+    q = _quest("Quest_SW_MainQuest")
+    assert q["objectives"] == ["AccessSW", "SpeakZilyana", "ReturnToZilyana",
+                               "DefeatKuldra", "BringHead"]
 
 
 def test_main_story_blockers_names_all_incomplete_predecessors():

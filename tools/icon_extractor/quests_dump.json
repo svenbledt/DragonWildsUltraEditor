@@ -125,10 +125,10 @@
     "category": "side",
     "rewards": [
       {
-        "item_id": "a5rs9Ub7jmlX89io81drhw",
-        "asset": "DA_Consumable_Vestige_Weapon_Staff_PharaohSceptre",
+        "item_id": "nPHTJky85bBWiI-YMJIatA",
+        "asset": "RECIPE_Weapon_Staff_PharaohSceptre",
         "count": 1,
-        "type": "item"
+        "type": "recipe_unlock"
       }
     ],
     "objectives": [
@@ -382,9 +382,9 @@
       "ReturnToTheWOM"
     ],
     "objective_texts": {
-      "SpeakToWom": "Speak to the Wise Old Man to learn about Fishing.",
-      "StartFishing": "Fish a Sardine at a fishing spot near the Wise Old Man.",
-      "ReturnToTheWOM": "Return to the Wise Old Man."
+      "SpeakToWom": "Speak to the Wise Old Man in Bramblemead Village to learn about Fishing.",
+      "StartFishing": "Fish a Sardine at a fishing spot near the Wise Old Man in Bramblemead Village.",
+      "ReturnToTheWOM": "Return to the Wise Old Man in Bramblemead Village."
     },
     "internal_name": "Quest_DR_FTUE_Fishing",
     "region": null,
@@ -1319,7 +1319,7 @@
       "AddPartsToTable"
     ],
     "objective_texts": {
-      "BodyParts.0": "Dig up body parts from graves around the Bloodblight Swamps. 0/3",
+      "BodyParts.0": "Dig up body parts from graves around Bloodblight Swamp. 0/3",
       "Objective2": "Speak to Fenkenstrain",
       "Objective3": "Speak to Fenkenstrain",
       "Objective4": "Bring Dr Fenkenstrain: 1 Weak Antipoison, 1 Weak Focused Attack Potion and 1 Weak Lumberjack Potion.",
@@ -1329,8 +1329,8 @@
       "Objective7": "Put Doctor Fenkenstrain's head on his new body on the examination table. ",
       "Objective8": "Put the Lightning-in-a-bottle into the machine in Doctor Fenkenstrain's lab. ",
       "Objective9": "Speak to Fenkenstrain",
-      "BodyParts.1": "Dig up body parts from graves around the Bloodblight Swamps. 1/3",
-      "BodyParts.2": "Dig up body parts from graves around the Bloodblight Swamps. 2/3",
+      "BodyParts.1": "Dig up body parts from graves around Bloodblight Swamp. 1/3",
+      "BodyParts.2": "Dig up body parts from graves around Bloodblight Swamp. 2/3",
       "AddPartsToTable": "Place the body parts on the examination table in Fenkenstrain's tower."
     },
     "internal_name": "GreatBodyRobbery",
@@ -1602,6 +1602,47 @@
     "hidden_in_quest_list": false
   },
   {
+    "quest_id": "Nw3wiUaB8siRIN2bStWJmw",
+    "asset": "Quest_SW_MainQuest",
+    "path": "RSDragonwilds/Content/Gameplay/Quests/ScornedWilderness/Quest_SW_MainQuest.uasset",
+    "name": "Regicide",
+    "description": "Take the fight to Kuldra, and end this once and for all. ",
+    "category": "main",
+    "rewards": [
+      {
+        "item_id": "yPxVHUt4c8xZInC2YuTobg",
+        "asset": "RECIPE_Armour_T8_Cape_Dragonslayer",
+        "count": 1,
+        "type": "recipe_unlock"
+      },
+      {
+        "item_id": "NfsDG0_3S4YQdcCD8_PjKA",
+        "asset": "ITEM_Consumable_KuldraPack_Unique",
+        "count": 1,
+        "type": "item"
+      }
+    ],
+    "objectives": [
+      "DefeatKuldra",
+      "BringHead",
+      "AccessSW",
+      "SpeakZilyana",
+      "ReturnToZilyana"
+    ],
+    "objective_texts": {
+      "DefeatKuldra": "Defeat Kuldra",
+      "BringHead": "Bring Kuldra's head to Zilyana. ",
+      "AccessSW": "Gain access to the Scorned Wilderness. ",
+      "SpeakZilyana": "Speak to Zilyana. ",
+      "ReturnToZilyana": "Once you are fully prepared, speak to Zilyana. "
+    },
+    "internal_name": "SW_MainQuest",
+    "region": null,
+    "is_main_quest": true,
+    "is_task_quest": false,
+    "hidden_in_quest_list": false
+  },
+  {
     "quest_id": "kPtTW0exXrqw2BqELR_bFA",
     "asset": "Quest_UmS_MainQuest",
     "path": "RSDragonwilds/Plugins/GameFeatures/UmbralSands/Content/Gameplay/Quests/UmS_MainQuest/Quest_UmS_MainQuest.uasset",
@@ -1609,6 +1650,12 @@
     "description": "Slay the tyrant dragon Fuzan and unite the Moon Garou along the way",
     "category": "main",
     "rewards": [
+      {
+        "item_id": "myqnDkdJSshMLUq3sMlSLA",
+        "asset": "RECIPE_Weapon_Shield_FuzanDragonfireShield",
+        "count": 1,
+        "type": "recipe_unlock"
+      },
       {
         "item_id": "-ScWrUBProaGeVmYdfrJAg",
         "asset": "ITEM_Consumable_Ums_MQ_RewardPack_Complete",
@@ -1736,7 +1783,7 @@
     "asset": "Quest_UmS_MainQuest1_TribeB_Task1",
     "path": "RSDragonwilds/Plugins/GameFeatures/UmbralSands/Content/Gameplay/Quests/UmS_MainQuest/TribeB_Tasks/Quest_UmS_MainQuest1_TribeB_Task1.uasset",
     "name": "Saga of the Adventurer",
-    "description": "Help Laguna - The Bard to find statues in rocky spires around the pyramid",
+    "description": "Help Laguna - The Bard to find stone slabs in rocky spires around the pyramid",
     "category": "side",
     "rewards": [
       {
@@ -1756,10 +1803,10 @@
     ],
     "objective_texts": {
       "FindTheClues": "Use your Saga to find clues towards the treasure",
-      "None": "Continue to find statues. Your Saga has been updated!",
-      "FindRemainingClues2/4": "Continue to find statues. Your Saga has been updated!",
-      "FindRemainingClues3/4": "Continue to find statues. Your Saga has been updated!",
-      "LocateTheGateway": "Follow the final clue to the last statue. Your Saga has been updated! ",
+      "None": "Continue to find stone slabs. Your Saga has been updated!",
+      "FindRemainingClues2/4": "Continue to find stone slabs. Your Saga has been updated!",
+      "FindRemainingClues3/4": "Continue to find stone slabs. Your Saga has been updated!",
+      "LocateTheGateway": "Follow the final clue to the last stone slab. Your Saga has been updated! ",
       "ReturnToBard": "Return to Laguna - The Bard"
     },
     "internal_name": "UmS_MainQuest_TribeB_Task1",
@@ -1884,11 +1931,13 @@
     ],
     "objectives": [
       "FindDragon",
-      "SearchLocation"
+      "SearchLocation",
+      "ReturnToGarou"
     ],
     "objective_texts": {
       "FindDragon": "Locate the dragon to the east and bring its heart back to Hedric - The Hunter",
-      "SearchLocation": "Search the village to the east for signs of the lost scouts"
+      "SearchLocation": "Search the village to the east for signs of the lost scouts",
+      "ReturnToGarou": "Return the dragon heart to Hedric - The Hunter"
     },
     "internal_name": "UmS_MainQuest_TribeC_Task2",
     "region": null,
@@ -1901,7 +1950,7 @@
     "asset": "Quest_UmS_MainQuest1_TribeC_Task3",
     "path": "RSDragonwilds/Plugins/GameFeatures/UmbralSands/Content/Gameplay/Quests/UmS_MainQuest/TribeC_Tasks/Quest_UmS_MainQuest1_TribeC_Task3.uasset",
     "name": "Song of the Ancients",
-    "description": "Complete the lost 'Song of the Ancients' by finding lyrics within the Dragonkin Vault.",
+    "description": "Complete the 'Song of the Ancients' by finding lyrics on stone slabs within the Dragonkin Vault.",
     "category": "side",
     "rewards": [],
     "objectives": [
@@ -1913,9 +1962,9 @@
       "Return"
     ],
     "objective_texts": {
-      "FindStatues.0": "Transcribe lyrics written on statues within the Dragonkin Vault. 0/3",
-      "FindStatues.1": "Transcribe lyrics written on statues within the Dragonkin Vault. 1/3",
-      "FindStatues.2": "Transcribe lyrics written on statues within the Dragonkin Vault. 2/3",
+      "FindStatues.0": "Transcribe lyrics written on stone slabs within the Dragonkin Vault. 0/3",
+      "FindStatues.1": "Transcribe lyrics written on stone slabs within the Dragonkin Vault. 1/3",
+      "FindStatues.2": "Transcribe lyrics written on stone slabs within the Dragonkin Vault. 2/3",
       "FindStatues.3": null,
       "FindStatues.4": null,
       "Return": "Return to Laguna - The Bard in the Manafem Camp. "
@@ -2054,18 +2103,11 @@
   {
     "quest_id": "xmM520wY0W5Qw8qE3YnC5Q",
     "asset": "Quest_Whip",
-    "path": "RSDragonwilds/Content/Gameplay/Quests/Quest_Whip.uasset",
+    "path": "RSDragonwilds/Content/Gameplay/Quests/Deleted/Quest_Whip.uasset",
     "name": null,
     "description": null,
     "category": "side",
-    "rewards": [
-      {
-        "item_id": "kRJ8QUBQGTMmDROOrE_OnQ",
-        "asset": "RECIPE_Masterworks_Club_AbyssalWhip",
-        "count": 1,
-        "type": "recipe_unlock"
-      }
-    ],
+    "rewards": [],
     "objectives": [],
     "objective_texts": {},
     "internal_name": "whip_quest",

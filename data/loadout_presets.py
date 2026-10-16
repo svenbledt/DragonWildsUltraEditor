@@ -227,14 +227,14 @@ STACK = 5000          # generous stack for consumables in storage
 AMMO_STACK = 99       # per arrow slot in the gear inventory
 RUNE_STACK = 999
 
-# Inventory tab boundaries (verified from real saves: 8-slot action bar + 3x8
-# per tab). Both tabs import these so the "preserve runes/ammo/quest on apply"
-# logic uses the same ranges the templates write into.
+# Inventory tab boundaries (8-slot action bar + the InventoryPages of the
+# player's inventory component). Both tabs import these so the "preserve
+# runes/ammo/quest on apply" logic uses the same ranges the templates write into.
 ACTION_BAR = (0, 7)
-MAIN_TAB = (8, 31)
-RUNE_TAB = (32, 55)
-AMMO_TAB = (56, 79)
-QUEST_TAB = (80, 103)
+MAIN_TAB = (8, 39)
+RUNE_TAB = (40, 71)
+AMMO_TAB = (72, 103)
+QUEST_TAB = (104, 175)
 RUNE_TAB_START, RUNE_TAB_END = RUNE_TAB
 AMMO_TAB_START, AMMO_TAB_END = AMMO_TAB
 QUEST_TAB_START, QUEST_TAB_END = QUEST_TAB
@@ -290,29 +290,30 @@ def build_gear(region, cls):
     elif cls == "Ranged":
         ammo = _id(L["ammo"][tier])
         inv["0"] = _gear_entry(weapon, vital_shield=0)   # bow in the action bar
-        # Arrows live in the AMMO tab (slots 56-79), NOT the action bar - this
+        # Arrows live in the AMMO tab (slots 72-103), NOT the action bar - this
         # matches the real inventory layout, so the ammo ref and the "preserve
-        # ammo" apply-logic line up. Equipped ammo = the first ammo slot (56).
+        # ammo" apply-logic line up. Equipped ammo = the first ammo slot (72).
         for s in range(AMMO_TAB_START, AMMO_TAB_START + 7):   # 7 arrow stacks
             inv[str(s)] = _gear_entry(ammo, count=AMMO_STACK)
             inv[str(s)]["VitalShield"] = 0
-        loadout["5"] = {"PlayerInventoryItemIndex": AMMO_TAB_START}  # ammo -> slot 56
+        loadout["5"] = {"PlayerInventoryItemIndex": AMMO_TAB_START}  # ammo -> slot 72
         loadout["7"] = {"PlayerInventoryItemIndex": 0}   # bow  -> inv slot 0
         loadout["8"] = {"PlayerInventoryItemIndex": 0}
 
     else:  # Magic
         inv["0"] = _gear_entry(weapon, vital_shield=0)
-        # runes at inventory slots 32..38 (Air lands on 34 for the loadout ref)
+        # runes from the first rune slot on (Air lands on the third for the
+        # loadout ref)
         for i, rune_name in enumerate(L["runes"]):
             rid = _id(rune_name)
             if not rid:
                 continue
-            slot = str(32 + i)
+            slot = str(RUNE_TAB_START + i)
             e = {"GUID": "", "ItemData": rid, "Count": RUNE_STACK}
             if rune_name in ("Air Rune", "Fire Rune"):
                 e["VitalShield"] = 0
             inv[slot] = e
-        loadout["6"] = {"PlayerInventoryItemIndex": 34}  # Air Rune
+        loadout["6"] = {"PlayerInventoryItemIndex": RUNE_TAB_START + 2}  # Air Rune
         loadout["7"] = {"PlayerInventoryItemIndex": 0}   # staff
         loadout["8"] = {"PlayerInventoryItemIndex": 0}
 

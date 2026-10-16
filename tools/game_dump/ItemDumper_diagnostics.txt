@@ -10,8 +10,10 @@ items DataPaths:
   /ScornedWilderness/Gameplay/Items
   /ScornedWilderness/Gameplay/Character/Player
   /ThrowableChinchompa/Chinchompa
+  /EarthMagic/Gameplay/Items
   /Quests_Banked/Gameplay/Items
   /Quests_Banked/Gameplay/Character/Player
+  /EarthMagic/Gameplay/Character/Player
   /Fishing/Gameplay/Items
   /Fishing/Gameplay/Character/Player
   /Agility/Gameplay/Items
@@ -31,6 +33,8 @@ recipes DataPaths:
   /ScornedWilderness/Gameplay/Character/Player
   /Quests_Banked/Gameplay/Items
   /Quests_Banked/Gameplay/Character/Player
+  /EarthMagic/Gameplay/Items
+  /EarthMagic/Gameplay/Character/Player
   /Fishing/Gameplay/Items
   /Fishing/Gameplay/Character/Player
   /Agility/Gameplay/Items
@@ -46,13 +50,14 @@ buildings DataPaths:
   /UmbralSands/Gameplay/BaseBuilding
   /UmbralSands/Gameplay/Buildpieces
   /ScornedWilderness/Gameplay/BaseBuilding
+  /EarthMagic/Gameplay/BaseBuilding
   /Fishing/Gameplay/BaseBuilding
   /Prayer/Gameplay/BaseBuilding
   /Agility/Gameplay/BaseBuilding
 mounts DataPaths:
   /Game/Gameplay/Mounts
-packages scanned: 14349, load errors: 0
-items: 1392 registered + 0 unregistered (junk)
-recipes: 1103 registered + 7 unregistered (junk)
-buildings: 772 registered + 0 unregistered (junk)
+packages scanned: 16898, load errors: 0
+items: 1545 registered + 0 unregistered (junk)
+recipes: 1225 registered + 7 unregistered (junk)
+buildings: 863 registered + 0 unregistered (junk)
 mounts: 16 registered + 5 unregistered (junk)
