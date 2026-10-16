@@ -1,2 +1,2 @@
-customtkinter>=5.2
-pillow>=10
+customtkinter>=5.2,<6
+pillow>=10,<13

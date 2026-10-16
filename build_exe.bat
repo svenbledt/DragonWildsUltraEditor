@@ -53,23 +53,62 @@ if errorlevel 1 (
 )
 
 REM --- 2. Create the isolated build venv ----------------------
+REM  Nuitka's tk-inter plugin needs Tcl/Tk's script library on disk.
+REM  Python 3.14+ from the Python install manager ships Tcl 9 with that
+REM  library packed inside the DLL (//zipfs:), which Nuitka cannot
+REM  bundle ("FATAL: tk-inter: Could not find Tcl"). So pick the newest
+REM  installed Python whose Tcl library is a real folder, and rebuild
+REM  the venv if it was created from an unusable one. A candidate only
+REM  counts when it prints its own interpreter path: the install
+REM  manager's "py -3.13" exits 0 even when 3.13 is not installed.
+set "TCLCHECK_PY=%TEMP%\dwue_tclcheck.py"
+> "%TCLCHECK_PY%" echo import os, sys, tkinter
+>>"%TCLCHECK_PY%" echo if os.path.isdir(tkinter.Tcl().eval("info library")): print(sys.executable)
+set "PYEXE="
+for %%V in (3.13 3.12 3.11 3.10 3) do (
+    if not defined PYEXE (
+        for /f "usebackq delims=" %%P in (`py -%%V "%TCLCHECK_PY%" 2^>nul`) do (
+            if exist "%%P" set "PYEXE=%%P"
+        )
+    )
+)
+if not defined PYEXE (
+    del /q "%TCLCHECK_PY%" 2>nul
+    echo [ERROR] No installed Python has a Tcl/Tk library Nuitka can bundle.
+    echo         Install Python 3.13 or 3.12 from https://www.python.org/downloads/
+    echo         with the "tcl/tk and IDLE" option ticked, then run this again.
+    goto :fail
+)
+if exist "%VPY%" (
+    set "VENV_OK="
+    for /f "usebackq delims=" %%P in (`call "%VPY%" "%TCLCHECK_PY%" 2^>nul`) do set "VENV_OK=1"
+    if not defined VENV_OK (
+        echo [1/6] Existing "%VENV%" uses a Python without a usable Tcl/Tk - rebuilding it.
+        rmdir /s /q "%VENV%"
+        if exist "%VENV%" ( echo [ERROR] Could not remove "%VENV%" - close anything using it. & goto :fail )
+    )
+)
+del /q "%TCLCHECK_PY%" 2>nul
 if not exist "%VPY%" (
-    echo [1/6] Creating build virtual environment "%VENV%" ...
-    py -m venv "%VENV%"
+    echo [1/6] Creating build virtual environment "%VENV%" from !PYEXE! ...
+    "!PYEXE!" -m venv "%VENV%"
     if errorlevel 1 ( echo [ERROR] Could not create the virtual environment. & goto :fail )
 ) else (
     echo [1/6] Reusing existing build venv "%VENV%".
 )
 
 REM --- 3. Install dependencies + Nuitka -----------------------
+REM  --no-compile: the venv lives in the project tree, and a cloud-sync
+REM  client racing pip's freshly written .pyc files makes the install
+REM  abort with "assert os.path.exists(pyc_path)".
 echo [2/6] Upgrading pip ...
-"%VPY%" -m pip install --upgrade pip
+"%VPY%" -m pip install --no-compile --upgrade pip
 if errorlevel 1 ( echo [ERROR] pip upgrade failed. & goto :fail )
 
 echo [3/6] Installing project requirements + Nuitka ...
-"%VPY%" -m pip install -r requirements.txt
+"%VPY%" -m pip install --no-compile -r requirements.txt
 if errorlevel 1 ( echo [ERROR] Installing requirements.txt failed. & goto :fail )
-"%VPY%" -m pip install --upgrade nuitka
+"%VPY%" -m pip install --no-compile --upgrade nuitka
 if errorlevel 1 ( echo [ERROR] Installing Nuitka failed. & goto :fail )
 
 REM --- 4. Clean previous build output -------------------------
@@ -77,7 +116,7 @@ REM  A running editor locks its exe and (on older builds) icon pngs
 REM  inside dist\, which makes the rmdir below fail half-way and the
 REM  final Compress-Archive die on a locked file. /FO CSV: the default
 REM  table truncates long image names, so find would never match.
-tasklist /FI "IMAGENAME eq %APPNAME%.exe" /NH /FO CSV 2>nul | find /I "%APPNAME%.exe" >nul
+tasklist /FI "IMAGENAME eq %APPNAME%.exe" /NH /FO CSV 2>nul | "%SystemRoot%\System32\find.exe" /I "%APPNAME%.exe" >nul
 if not errorlevel 1 (
     echo [ERROR] %APPNAME%.exe is running. Close the editor first -
     echo         it locks files in dist\, so cleaning/zipping fails.
@@ -175,6 +214,7 @@ echo(
 echo  Tip: the app writes settings.json next to wherever the
 echo  exe is launched from. Run it on a COPY of a save first.
 echo ============================================================
+call :pause_if_clicked
 endlocal
 exit /b 0
 
@@ -183,5 +223,14 @@ echo(
 echo ------------------------------------------------------------
 echo  BUILD FAILED - nothing was produced. See messages above.
 echo ------------------------------------------------------------
+call :pause_if_clicked
 endlocal
 exit /b 1
+
+REM  Keep the window open when this file was double-clicked (Explorer
+REM  starts it as cmd /c "...build_exe.bat"); stay silent when it runs
+REM  from a terminal or is CALLed by make_dist.bat, which pauses itself.
+:pause_if_clicked
+echo !cmdcmdline! | "%SystemRoot%\System32\find.exe" /I "%~nx0" >nul
+if not errorlevel 1 pause
+exit /b
