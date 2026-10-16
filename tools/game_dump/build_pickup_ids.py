@@ -9,10 +9,16 @@ import json
 import os
 import sys
 
-# /AlwaysCook/ holds cook-forcing blueprint duplicates, not obtainable items
-# (e.g. the Fire Cape vestige recipe-unlocker, which breaks the strict load).
 # /Deleted/ etc. hold dead, unobtainable content.
-BAD_FOLDERS = ("/Deleted/", "/Dev/", "/Test/", "/Debug/", "/AlwaysCook/")
+BAD_FOLDERS = ("/Deleted/", "/Dev/", "/Test/", "/Debug/")
+
+# /AlwaysCook/ is NOT bad as a folder: since the Agility update the game keeps
+# real, obtainable vestiges there (e.g. the Icthlarian Fetish quest reward,
+# which the game itself writes to ItemsPickedUp). Only ids proven to break the
+# strict load are listed here.
+BAD_PIDS = {
+    "NndX3U-UM-JVFaKvgrz8Eg",  # Fire Cape vestige (AlwaysCook recipe-unlocker)
+}
 
 
 def item_name(rec):
@@ -22,9 +28,11 @@ def item_name(rec):
 def breaks_load(rec):
     """True if this id in ItemsPickedUp can abort the strict-mode load:
     unregistered (outside the ItemSubsystem's DefaultGame.ini +DataPaths) or
-    in a dead/dev folder (incl. /AlwaysCook/ - the Fire Cape vestige there is
-    proven to break loading). This is the Save doctor's blocklist criterion."""
+    in a dead/dev folder, or a known-bad id (the Fire Cape vestige is proven
+    to break loading). This is the Save doctor's blocklist criterion."""
     if not rec.get("__registered", True):
+        return True
+    if rec.get("PersistenceID") in BAD_PIDS:
         return True
     full = rec.get("__fullname", "") or ""
     return any(bad in full for bad in BAD_FOLDERS)

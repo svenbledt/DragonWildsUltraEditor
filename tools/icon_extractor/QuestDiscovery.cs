@@ -15,7 +15,7 @@ using Newtonsoft.Json;
 // Quest definition dumper (--quests). See Program.cs for the icon modes.
 // Exploration submodes:
 //   --quests raw <AssetNameSubstring>   dump full property JSON of matching quest packages
-//   --quests enums                      list usmap enums whose name contains "quest"
+//   --quests enums [filter]             list usmap enums whose name contains filter (default "quest")
 //   --quests                            full dump to quests_dump.json
 static class QuestDiscovery
 {
@@ -64,9 +64,10 @@ static class QuestDiscovery
             var usmap = new FileUsmapTypeMappingsProvider(@"F:\SteamLibrary\steamapps\common\RSDragonwilds\RSDragonwilds\Binaries\Win64\ue4ss\Mappings.usmap");
             usmap.Reload();
             var mappings = usmap.MappingsForGame;
+            var filter = args.Length > 2 ? args[2] : "quest";
             foreach (var kv in mappings.Enums.OrderBy(k => k.Key))
             {
-                if (kv.Key.IndexOf("quest", StringComparison.OrdinalIgnoreCase) < 0) continue;
+                if (kv.Key.IndexOf(filter, StringComparison.OrdinalIgnoreCase) < 0) continue;
                 Console.WriteLine($"enum {kv.Key}:");
                 foreach (var e in kv.Value.OrderBy(e => e.Key))
                     Console.WriteLine($"  {e.Key} = {e.Value}");
@@ -302,7 +303,10 @@ static class QuestDiscovery
                     e.hidden_in_quest_list = exp.GetOrDefault<bool>("bHideInQuestList", false);
                     e.category = isFtue ? "tutorial" : (isMain ? "main" : "side");
 
-                    var objMap = exp.GetOrDefault<CUE4Parse.UE4.Assets.Objects.UScriptMap>("ObjectiveTexts");
+                    // pre-Agility builds: ObjectiveTexts (name -> FText);
+                    // Agility update: Objectives (name -> struct with Description)
+                    var objMap = exp.GetOrDefault<CUE4Parse.UE4.Assets.Objects.UScriptMap>("ObjectiveTexts")
+                              ?? exp.GetOrDefault<CUE4Parse.UE4.Assets.Objects.UScriptMap>("Objectives");
                     if (objMap != null)
                     {
                         foreach (var kv in objMap.Properties)
@@ -311,7 +315,11 @@ static class QuestDiscovery
                             if (id == null) continue;
                             e.objectives.Add(id);
                             string txt = null;
-                            if (kv.Value?.GenericValue is CUE4Parse.UE4.Objects.Core.i18N.FText ft) txt = TextOf(provider, contentIndex, ft);
+                            var val = kv.Value?.GenericValue;
+                            if (val is CUE4Parse.UE4.Assets.Objects.FScriptStruct ss
+                                && ss.StructType is CUE4Parse.UE4.Assets.Objects.FStructFallback sf)
+                                val = sf.GetOrDefault<CUE4Parse.UE4.Objects.Core.i18N.FText>("Description");
+                            if (val is CUE4Parse.UE4.Objects.Core.i18N.FText ft) txt = TextOf(provider, contentIndex, ft);
                             e.objective_texts[id] = txt;
                         }
                     }
