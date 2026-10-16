@@ -111,6 +111,14 @@ if errorlevel 1 ( echo [ERROR] Installing requirements.txt failed. & goto :fail 
 "%VPY%" -m pip install --no-compile --upgrade nuitka
 if errorlevel 1 ( echo [ERROR] Installing Nuitka failed. & goto :fail )
 
+REM  --venv-only: stop here with a ready .venv-build (make_dist.bat uses
+REM  it to run the test suite before compiling).
+if /I "%~1"=="--venv-only" (
+    echo [venv] "%VENV%" is ready.
+    endlocal
+    exit /b 0
+)
+
 REM --- 4. Clean previous build output -------------------------
 REM  A running editor locks its exe and (on older builds) icon pngs
 REM  inside dist\, which makes the rmdir below fail half-way and the

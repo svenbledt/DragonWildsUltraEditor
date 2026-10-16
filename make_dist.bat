@@ -56,8 +56,20 @@ if errorlevel 1 ( echo %RD%[ERROR]%R% Python launcher 'py' not found. Install Py
 REM  fail here, not 10 minutes in: a running editor locks dist\ files
 REM  and step 5's clean + zip would die on them (/FO CSV because the
 REM  default tasklist table truncates the long image name)
-tasklist /FI "IMAGENAME eq DragonWildsUltraEditor.exe" /NH /FO CSV 2>nul | find /I "DragonWildsUltraEditor.exe" >nul
+tasklist /FI "IMAGENAME eq DragonWildsUltraEditor.exe" /NH /FO CSV 2>nul | "%SystemRoot%\System32\find.exe" /I "DragonWildsUltraEditor.exe" >nul
 if not errorlevel 1 ( echo %RD%[ERROR]%R% DragonWildsUltraEditor.exe is running - close the editor first, it locks files in dist\. & goto :fail )
+REM  A game update makes the UE4SS Mappings.usmap stale: CUE4Parse then
+REM  misreads changed classes and the dumps come out silently wrong.
+REM  Same game path the icon_extractor defaults to.
+set "GAMEBIN=F:\SteamLibrary\steamapps\common\RSDragonwilds\RSDragonwilds\Binaries\Win64"
+powershell -NoProfile -Command "$u='%GAMEBIN%\ue4ss\Mappings.usmap'; $e='%GAMEBIN%\RSDragonwilds-Win64-Shipping.exe'; if ((Test-Path $u) -and (Test-Path $e) -and ((Get-Item $u).LastWriteTime -lt (Get-Item $e).LastWriteTime)) { exit 1 }"
+if errorlevel 1 (
+    echo %YL%[WARNING]%R% Mappings.usmap is older than the game exe - the game was updated.
+    echo           Regenerate it first: start the game with UE4SS and dump the
+    echo           usmap ^(UE4SS keybind Ctrl+Numpad6^), then run this again.
+    echo           Press a key to continue with the old mappings anyway.
+    pause >nul
+)
 
 call :epoch
 set "PIPE_START=!EPOCH!"
@@ -93,13 +105,20 @@ call :step_end 3
 
 REM --- 4. Test suite -------------------------------------------
 call :step_begin 4 "%S4%"
-py -m pytest tests -q
+REM  The default Python usually has no pytest (and may not be one Nuitka
+REM  can build with), so the tests run in the build venv: build_exe.bat
+REM  --venv-only creates/updates it, then pytest is added to it.
+call "%~dp0build_exe.bat" --venv-only
+if errorlevel 1 ( echo %RD%[ERROR]%R% Could not prepare the build venv. & goto :fail )
+".venv-build\Scripts\python.exe" -m pip install --no-compile -q pytest
+if errorlevel 1 ( echo %RD%[ERROR]%R% Installing pytest into the build venv failed. & goto :fail )
+".venv-build\Scripts\python.exe" -m pytest tests -q -p no:cacheprovider
 if errorlevel 1 ( echo %RD%[ERROR]%R% Tests failed - dist aborted. & goto :fail )
 call :step_end 4
 
 REM --- 5. Compile exe + zip ------------------------------------
 call :step_begin 5 "%S5%  (build_exe.bat)"
-call build_exe.bat
+call "%~dp0build_exe.bat"
 if errorlevel 1 ( goto :fail )
 call :step_end 5
 
